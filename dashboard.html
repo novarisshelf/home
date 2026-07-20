@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novaris — অর্ডার ড্যাশবোর্ড</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+  <div class="owner-bar">
+    <div class="owner-bar-inner">
+      <div class="owner-bar-links">
+        <a href="dashboard.html" class="active">অর্ডার</a>
+        <a href="admin.html">বই পরিচালনা</a>
+        <a href="admin-decor.html">ডেকর পরিচালনা</a>
+      </div>
+      <button class="owner-logout" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> লগআউট</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <h1 style="margin-top: 24px;">অর্ডার ইতিহাস</h1>
+    <div id="orders-list">
+      <p class="loading-state">অর্ডার লোড হচ্ছে…</p>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+
+  <script type="module">
+    import { requireAuth, logoutUser } from './js/auth.js';
+    import { fetchOrders } from './js/dashboard.js';
+
+    await requireAuth();
+
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      await logoutUser();
+      window.location.href = 'login.html';
+    });
+
+    const listEl = document.getElementById('orders-list');
+    const statusLabels = { pending: 'পেন্ডিং', completed: 'সম্পন্ন', cancelled: 'বাতিল' };
+
+    function formatTime(ts) {
+      if (!ts || !ts.toDate) return '';
+      return ts.toDate().toLocaleString('bn-BD', { dateStyle: 'medium', timeStyle: 'short' });
+    }
+
+    try {
+      const orders = await fetchOrders();
+
+      if (orders.length === 0) {
+        listEl.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-receipt"></i>
+            <p>এখনো কোনো অর্ডার আসেনি।</p>
+          </div>
+        `;
+      } else {
+        listEl.innerHTML = orders.map((order) => {
+          const status = order.status || 'pending';
+          const itemsText = (order.items || [])
+            .map((i) => `${i.title} × ${i.qty}`)
+            .join(', ');
+          return `
+            <div class="card order-card">
+              <div class="order-card-head">
+                <div>
+                  <p class="order-customer">${order.customerName || ''}</p>
+                  <p class="order-time">${order.phone || ''} · ${formatTime(order.createdAt)}</p>
+                </div>
+                <span class="status-badge status-${status}">${statusLabels[status] || status}</span>
+              </div>
+              <p class="order-items-list">${itemsText}</p>
+              <p>${order.address || ''}</p>
+              <p class="order-total">মোট: ৳${order.totalPrice || 0}</p>
+            </div>
+          `;
+        }).join('');
+      }
+    } catch (err) {
+      console.error(err);
+      listEl.innerHTML = `<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><p>অর্ডার লোড করা যায়নি। Firebase কনফিগারেশন যাচাই করুন।</p></div>`;
+    }
+  </script>
+  <script type="module" src="js/footer.js"></script>
+</body>
+</html>

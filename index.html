@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novaris — বই ও ঘর সাজানোর জিনিসপত্র</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="navbar-brand">Novaris</a>
+      <div class="navbar-links">
+        <a href="#home-decor">Home Decor</a>
+        <a href="cart.html" class="navbar-cart" aria-label="কার্ট">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span class="cart-badge">0</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="intro-strip">
+    <p>বই আর ঘর সাজানোর ছোট্ট জিনিসপত্র — সব একসাথে, একই তাকে।</p>
+  </div>
+
+  <div class="search-strip">
+    <div class="search-box">
+      <i class="fa-solid fa-magnifying-glass search-box-icon"></i>
+      <input
+        type="text"
+        id="search-input"
+        class="search-box-input"
+        placeholder="বই, লেখক বা পণ্যের নাম লিখুন…"
+        aria-label="খুঁজুন"
+      >
+      <button type="button" id="search-clear-btn" class="search-box-clear" aria-label="খোঁজ মুছুন" style="display:none;">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+
+  <div id="catalog-sections">
+    <main id="genre-sections">
+      <p class="loading-state">বইয়ের তালিকা লোড হচ্ছে…</p>
+    </main>
+
+    <section id="home-decor">
+      <div class="container">
+        <h2 class="catalog-heading">Home Decor</h2>
+        <p class="catalog-subheading">Hobby &amp; Collectibles আর ঘর সাজানোর জিনিস</p>
+      </div>
+      <div id="decor-sections">
+        <p class="loading-state">পণ্যের তালিকা লোড হচ্ছে…</p>
+      </div>
+    </section>
+  </div>
+
+  <section id="search-results" class="genre-section" style="display:none;">
+    <h2 class="section-title" id="search-results-title">ফলাফল</h2>
+    <div class="book-grid" id="search-results-grid"></div>
+  </section>
+
+  <div id="site-footer"></div>
+
+  <script type="module">
+    import { getGenres, getRandomBooksByGenre, getAllBooks, createBookCard } from './js/books.js';
+    import { getDecorCategories, getRandomDecorItemsByCategory, getAllDecorItems, createDecorCard } from './js/decor.js';
+    import { renderCartBadge } from './js/cart.js';
+
+    const catalogSections = document.getElementById('catalog-sections');
+    const booksMain = document.getElementById('genre-sections');
+    const decorSections = document.getElementById('decor-sections');
+    const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+    const countPerSection = isDesktop ? 6 : 2;
+
+    const searchInput = document.getElementById('search-input');
+    const clearBtn = document.getElementById('search-clear-btn');
+    const resultsSection = document.getElementById('search-results');
+    const resultsTitle = document.getElementById('search-results-title');
+    const resultsGrid = document.getElementById('search-results-grid');
+
+    function normalize(str) {
+      return (str || '').toLowerCase().trim();
+    }
+
+    function buildShelves(container, categories, items, countPer, getRandomFn, createCardFn) {
+      categories.forEach((category) => {
+        const section = document.createElement('section');
+        section.className = 'genre-section';
+
+        const heading = document.createElement('h2');
+        heading.className = 'section-title';
+        heading.textContent = category;
+
+        const grid = document.createElement('div');
+        grid.className = 'book-grid';
+        getRandomFn(items, category, countPer).forEach((item) => {
+          grid.appendChild(createCardFn(item));
+        });
+
+        section.appendChild(heading);
+        section.appendChild(grid);
+        container.appendChild(section);
+      });
+    }
+
+    // Combined search corpus: every book and decor item, tagged with its type
+    // so search results link to the right detail page and use the right card.
+    function runSearch(rawQuery, corpus) {
+      const q = normalize(rawQuery);
+
+      if (!q) {
+        resultsSection.style.display = 'none';
+        catalogSections.style.display = '';
+        clearBtn.style.display = 'none';
+        return;
+      }
+
+      clearBtn.style.display = 'inline-flex';
+      catalogSections.style.display = 'none';
+      resultsSection.style.display = '';
+
+      const matches = corpus.filter((entry) =>
+        normalize(entry.title).includes(q) ||
+        normalize(entry.author).includes(q) ||
+        normalize(entry.category).includes(q) ||
+        normalize(entry.material).includes(q)
+      );
+
+      resultsTitle.textContent = `"${rawQuery}" এর জন্য ফলাফল (${matches.length})`;
+      resultsSection.querySelector('.empty-state')?.remove();
+      resultsGrid.innerHTML = '';
+
+      if (matches.length === 0) {
+        resultsSection.insertAdjacentHTML('beforeend', `
+          <div class="empty-state">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <p>কিছু পাওয়া যায়নি। অন্য নাম দিয়ে খুঁজে দেখুন।</p>
+          </div>
+        `);
+        return;
+      }
+
+      matches.forEach((entry) => {
+        const card = entry._type === 'decor' ? createDecorCard(entry) : createBookCard(entry);
+        resultsGrid.appendChild(card);
+      });
+    }
+
+    async function init() {
+      let allBooks = [];
+      let allDecorItems = [];
+
+      try {
+        [allBooks, allDecorItems] = await Promise.all([getAllBooks(), getAllDecorItems()]);
+      } catch (err) {
+        console.error(err);
+        booksMain.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <p>তালিকা লোড করা যায়নি। আবার চেষ্টা করুন।</p>
+          </div>
+        `;
+        decorSections.innerHTML = '';
+        return;
+      }
+
+      booksMain.innerHTML = '';
+      buildShelves(booksMain, getGenres(allBooks), allBooks, countPerSection, getRandomBooksByGenre, createBookCard);
+
+      decorSections.innerHTML = '';
+      buildShelves(decorSections, getDecorCategories(allDecorItems), allDecorItems, countPerSection, getRandomDecorItemsByCategory, createDecorCard);
+
+      renderCartBadge();
+
+      const searchCorpus = [
+        ...allBooks.map((b) => ({ ...b, _type: 'book' })),
+        ...allDecorItems.map((d) => ({ ...d, _type: 'decor' }))
+      ];
+
+      let searchDebounce;
+      searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchDebounce);
+        searchDebounce = setTimeout(() => runSearch(e.target.value, searchCorpus), 150);
+      });
+
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        runSearch('', searchCorpus);
+        searchInput.focus();
+      });
+    }
+
+    init();
+  </script>
+  <script type="module" src="js/footer.js"></script>
+</body>
+</html>

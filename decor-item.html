@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novaris — পণ্যের বিস্তারিত</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="navbar-brand">Novaris</a>
+      <div class="navbar-links">
+        <a href="index.html#home-decor">Home Decor</a>
+        <a href="cart.html" class="navbar-cart" aria-label="কার্ট">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span class="cart-badge">0</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <a href="index.html#home-decor" class="back-link"><i class="fa-solid fa-arrow-left"></i> হোমে ফিরুন</a>
+
+    <div id="item-detail">
+      <p class="loading-state">পণ্যটি খোঁজা হচ্ছে…</p>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { getDecorItemById } from './js/decor.js';
+    import { addToCart, renderCartBadge } from './js/cart.js';
+
+    const params = new URLSearchParams(window.location.search);
+    const itemId = params.get('id');
+    const item = itemId ? await getDecorItemById(itemId) : null;
+
+    const container = document.getElementById('item-detail');
+
+    if (!item) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <i class="fa-solid fa-box-open"></i>
+          <p>দুঃখিত, পণ্যটি খুঁজে পাওয়া যায়নি।</p>
+        </div>
+      `;
+    } else {
+      const hasDiscount = item.regularPrice && item.regularPrice > item.currentPrice;
+
+      const optionalFields = [
+        ['ক্যাটাগরি', item.category],
+        ['উপাদান', item.material],
+        ['মাপ', item.dimensions]
+      ].filter(([, value]) => value);
+
+      container.innerHTML = `
+        <div class="detail-layout">
+          <div class="detail-cover-wrap">
+            <img src="${item.coverImage}" alt="${item.title}">
+          </div>
+          <div>
+            <h1>${item.title}</h1>
+            <p class="book-card-author">${item.category}</p>
+
+            <div class="detail-price-row">
+              <span class="price-current">৳${item.currentPrice}</span>
+              ${hasDiscount ? `<span class="price-regular">৳${item.regularPrice}</span>` : ''}
+            </div>
+
+            <p>${item.description}</p>
+
+            ${optionalFields.length ? `
+              <dl class="detail-meta">
+                ${optionalFields.map(([label, value]) => `<dt>${label}</dt><dd>${value}</dd>`).join('')}
+              </dl>
+            ` : ''}
+
+            <div class="detail-actions">
+              ${item.inStock ? `
+                <input type="number" id="qty-input" class="form-input qty-input" value="1" min="1">
+                <button id="add-to-cart-btn" class="btn btn-primary">
+                  <i class="fa-solid fa-cart-plus"></i> কার্টে যোগ করুন
+                </button>
+              ` : `
+                <span class="stock-msg"><i class="fa-solid fa-ban"></i> স্টকে নেই</span>
+              `}
+            </div>
+          </div>
+        </div>
+      `;
+
+      const addBtn = document.getElementById('add-to-cart-btn');
+      if (addBtn) {
+        addBtn.addEventListener('click', () => {
+          const qty = parseInt(document.getElementById('qty-input').value, 10) || 1;
+          addToCart(item, 'decor', qty);
+          showToast('কার্টে যোগ করা হয়েছে ✓');
+        });
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+
+    renderCartBadge();
+  </script>
+  <script type="module" src="js/footer.js"></script>
+</body>
+</html>

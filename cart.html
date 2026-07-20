@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novaris — কার্ট</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="navbar-brand">Novaris</a>
+      <div class="navbar-links">
+        <a href="index.html#home-decor">Home Decor</a>
+        <a href="cart.html" class="navbar-cart" aria-label="কার্ট">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span class="cart-badge">0</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>আপনার কার্ট</h1>
+
+    <div class="cart-layout" id="cart-layout">
+      <div class="card" id="cart-items-card">
+        <!-- cart items injected here -->
+      </div>
+
+      <div class="card" id="checkout-card">
+        <h2>চেকআউট</h2>
+        <div class="cart-summary-row">
+          <span>সাবটোটাল</span>
+          <span id="summary-subtotal">৳0</span>
+        </div>
+        <div class="cart-summary-row cart-summary-total">
+          <span>মোট</span>
+          <span id="summary-total">৳0</span>
+        </div>
+
+        <form id="checkout-form" style="margin-top: 18px;">
+          <div class="form-group">
+            <label class="form-label" for="cust-name">নাম *</label>
+            <input class="form-input" type="text" id="cust-name" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cust-phone">ফোন নম্বর *</label>
+            <input class="form-input" type="tel" id="cust-phone" placeholder="01XXXXXXXXX" required>
+            <p class="form-error" id="phone-error" style="display:none;">সঠিক বাংলাদেশি মোবাইল নম্বর দিন</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cust-address">ঠিকানা *</label>
+            <textarea class="form-textarea" id="cust-address" required></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cust-email">ইমেইল (ঐচ্ছিক)</label>
+            <input class="form-input" type="email" id="cust-email">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="place-order-btn">
+            <i class="fa-solid fa-check"></i> অর্ডার করুন
+          </button>
+          <p class="form-error" id="order-error" style="display:none;"></p>
+        </form>
+
+        <div id="order-confirmation" style="display:none;">
+          <div class="empty-state">
+            <i class="fa-solid fa-circle-check"></i>
+            <p>ধন্যবাদ! আপনার অর্ডার সফলভাবে সম্পন্ন হয়েছে।</p>
+            <a href="index.html" class="btn btn-outline" style="margin-top: 10px;">কেনাকাটা চালিয়ে যান</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+
+  <script type="module">
+    import {
+      getCart, removeFromCart, updateCartItemQty, getCartTotal, renderCartBadge
+    } from './js/cart.js';
+    // checkout.js pulls in Firebase, so it's loaded lazily on submit — the
+    // cart itself (view/edit/remove) never depends on Firebase being reachable.
+
+    function renderCart() {
+      const cart = getCart();
+      const itemsCard = document.getElementById('cart-items-card');
+      const checkoutCard = document.getElementById('checkout-card');
+
+      if (cart.length === 0) {
+        itemsCard.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <p>আপনার কার্ট খালি।</p>
+            <a href="index.html" class="btn btn-outline" style="margin-top: 10px;">কেনাকাটা করুন</a>
+          </div>
+        `;
+        checkoutCard.style.display = 'none';
+        return;
+      }
+
+      checkoutCard.style.display = '';
+      itemsCard.innerHTML = `<h2>পণ্যসমূহ (${cart.length})</h2>` + cart.map((item) => `
+        <div class="cart-item" data-item-id="${item.itemId}" data-item-type="${item.itemType}">
+          <div>
+            <p class="cart-item-title">${item.title}</p>
+            <p class="cart-item-price">৳${item.price} × ${item.qty}</p>
+          </div>
+          <input type="number" class="form-input qty-input qty-field" min="1" value="${item.qty}" data-item-id="${item.itemId}" data-item-type="${item.itemType}">
+          <span class="price-current">৳${item.price * item.qty}</span>
+          <button class="icon-btn danger remove-btn" data-item-id="${item.itemId}" data-item-type="${item.itemType}" aria-label="সরিয়ে ফেলুন">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </div>
+      `).join('');
+
+      itemsCard.querySelectorAll('.qty-field').forEach((input) => {
+        input.addEventListener('change', (e) => {
+          updateCartItemQty(e.target.dataset.itemId, e.target.dataset.itemType, parseInt(e.target.value, 10));
+          renderCart();
+        });
+      });
+      itemsCard.querySelectorAll('.remove-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          removeFromCart(e.currentTarget.dataset.itemId, e.currentTarget.dataset.itemType);
+          renderCart();
+        });
+      });
+
+      const total = getCartTotal();
+      document.getElementById('summary-subtotal').textContent = `৳${total}`;
+      document.getElementById('summary-total').textContent = `৳${total}`;
+    }
+
+    document.getElementById('checkout-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('cust-name').value.trim();
+      const phone = document.getElementById('cust-phone').value.trim();
+      const address = document.getElementById('cust-address').value.trim();
+      const email = document.getElementById('cust-email').value.trim();
+      const phoneError = document.getElementById('phone-error');
+      const orderError = document.getElementById('order-error');
+
+      const validPhone = /^01[3-9]\d{8}$/.test(phone);
+      phoneError.style.display = validPhone ? 'none' : 'block';
+      if (!validPhone) return;
+
+      const btn = document.getElementById('place-order-btn');
+      btn.disabled = true;
+      btn.textContent = 'পাঠানো হচ্ছে…';
+      orderError.style.display = 'none';
+
+      try {
+        const { submitOrder } = await import('./js/checkout.js');
+        await submitOrder({ name, phone, address, email });
+        document.getElementById('checkout-form').style.display = 'none';
+        document.getElementById('order-confirmation').style.display = 'block';
+      } catch (err) {
+        console.error(err);
+        orderError.textContent = 'অর্ডার পাঠাতে সমস্যা হয়েছে। আবার চেষ্টা করুন।';
+        orderError.style.display = 'block';
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> অর্ডার করুন';
+      }
+    });
+
+    renderCart();
+    renderCartBadge();
+  </script>
+  <script type="module" src="js/footer.js"></script>
+</body>
+</html>
