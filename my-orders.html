@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novaris — আমার অর্ডার</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="navbar-brand">Novaris</a>
+      <div class="navbar-links">
+        <a href="index.html#home-decor">Home Decor</a>
+        <span id="customer-nav-slot" class="navbar-account"></span>
+        <a href="cart.html" class="navbar-cart" aria-label="কার্ট">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span class="cart-badge">0</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1 style="margin-top: 24px;">আমার অর্ডার</h1>
+    <div id="orders-list">
+      <p class="loading-state">অর্ডার লোড হচ্ছে…</p>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+
+  <script type="module">
+    import { requireCustomerAuth, logoutCustomer } from './js/customer-auth.js';
+    import { db } from './js/firebase-config.js';
+    import {
+      collection,
+      query,
+      where,
+      orderBy,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+    import { renderCartBadge } from './js/cart.js';
+
+    const user = await requireCustomerAuth();
+
+    const listEl = document.getElementById('orders-list');
+    const statusLabels = { pending: 'পেন্ডিং', completed: 'সম্পন্ন', cancelled: 'বাতিল' };
+
+    function formatTime(ts) {
+      if (!ts || !ts.toDate) return '';
+      return ts.toDate().toLocaleString('bn-BD', { dateStyle: 'medium', timeStyle: 'short' });
+    }
+
+    try {
+      const q = query(
+        collection(db, 'orders'),
+        where('customerUid', '==', user.uid),
+        orderBy('createdAt', 'desc')
+      );
+      const snapshot = await getDocs(q);
+      const orders = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+      if (orders.length === 0) {
+        listEl.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-receipt"></i>
+            <p>আপনার এখনো কোনো অর্ডার নেই।</p>
+            <a href="index.html" class="btn btn-outline" style="margin-top: 10px;">কেনাকাটা করুন</a>
+          </div>
+        `;
+      } else {
+        listEl.innerHTML = orders.map((order) => {
+          const status = order.status || 'pending';
+          const itemsText = (order.items || [])
+            .map((i) => `${i.title} × ${i.qty}`)
+            .join(', ');
+          return `
+            <div class="card order-card">
+              <div class="order-card-head">
+                <div>
+                  <p class="order-time">${formatTime(order.createdAt)}</p>
+                </div>
+                <span class="status-badge status-${status}">${statusLabels[status] || status}</span>
+              </div>
+              <p class="order-items-list">${itemsText}</p>
+              <p>${order.address || ''}</p>
+              <p class="order-total">মোট: ৳${order.totalPrice || 0}</p>
+            </div>
+          `;
+        }).join('');
+      }
+    } catch (err) {
+      console.error(err);
+      listEl.innerHTML = `<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><p>অর্ডার লোড করা যায়নি। আবার চেষ্টা করুন।</p></div>`;
+    }
+
+    renderCartBadge();
+  </script>
+  <script type="module" src="js/customer-nav.js"></script>
+  <script type="module" src="js/footer.js"></script>
+</body>
+</html>

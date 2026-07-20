@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novaris — লগইন / সাইন আপ</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="navbar-brand">Novaris</a>
+      <div class="navbar-links">
+        <a href="cart.html" class="navbar-cart" aria-label="কার্ট">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span class="cart-badge">0</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="auth-wrap">
+    <div class="card auth-card customer-auth-card">
+
+      <div class="auth-tabs">
+        <button type="button" class="tab-btn active" id="tab-login">লগইন</button>
+        <button type="button" class="tab-btn" id="tab-signup">সাইন আপ</button>
+      </div>
+
+      <!-- ─────────────── LOGIN FORM ─────────────── -->
+      <div class="auth-form active" id="form-login">
+        <div class="form-group">
+          <label class="form-label" for="login-email">ইমেইল</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-envelope"></i>
+            <input class="form-input" type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="login-password">পাসওয়ার্ড</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-lock"></i>
+            <input class="form-input" type="password" id="login-password" placeholder="আপনার পাসওয়ার্ড" autocomplete="current-password">
+            <button type="button" class="eye-btn" id="login-eye-btn" tabindex="-1"><i class="fa-solid fa-eye"></i></button>
+          </div>
+          <div style="text-align:right; margin-top:6px;">
+            <a href="#" id="open-forgot" style="font-size:.82rem; color:var(--color-primary); font-weight:600;">পাসওয়ার্ড ভুলে গেছেন?</a>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-primary btn-block" id="login-btn">
+          <i class="fa-solid fa-right-to-bracket"></i> লগইন করুন
+        </button>
+
+        <div id="login-msg" class="msg-bar"></div>
+
+        <div class="auth-divider">অথবা</div>
+
+        <button type="button" class="google-btn" id="login-google-btn">
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23EA4335' d='M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z'/%3E%3Cpath fill='%234285F4' d='M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z'/%3E%3Cpath fill='%23FBBC05' d='M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z'/%3E%3Cpath fill='%2334A853' d='M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z'/%3E%3C/svg%3E" alt="Google">
+          Google দিয়ে চালিয়ে যান
+        </button>
+      </div><!-- /form-login -->
+
+      <!-- ─────────────── FORGOT PASSWORD ─────────────── -->
+      <div class="auth-form" id="form-forgot">
+        <button type="button" id="close-forgot" style="background:none; border:none; color:var(--color-text-muted); font-size:.82rem; font-weight:600; margin-bottom:14px; display:flex; align-items:center; gap:6px; padding:0;">
+          <i class="fa-solid fa-arrow-left"></i> লগইনে ফিরুন
+        </button>
+
+        <p style="font-size:.86rem; color:var(--color-text-muted); margin-bottom:10px; line-height:1.5;">
+          আপনার ইমেইল দিন, আমরা পাসওয়ার্ড রিসেট করার লিংক পাঠিয়ে দেব।
+        </p>
+        <div class="info-note">
+          <i class="fa-solid fa-circle-info"></i>
+          <p>Google দিয়ে সাইন আপ করেছেন? তাহলে <strong>Google দিয়ে চালিয়ে যান</strong> বাটন দিয়ে লগইন করুন — এখানে কোনো পাসওয়ার্ড রিসেট করার দরকার নেই।</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="forgot-email">ইমেইল</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-envelope"></i>
+            <input class="form-input" type="email" id="forgot-email" placeholder="you@example.com" autocomplete="email">
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-primary btn-block" id="forgot-btn">
+          <i class="fa-solid fa-paper-plane"></i> রিসেট লিংক পাঠান
+        </button>
+
+        <p id="forgot-cooldown" class="cooldown-note"></p>
+        <div id="forgot-msg" class="msg-bar"></div>
+      </div><!-- /form-forgot -->
+
+      <!-- ─────────────── SIGNUP FORM ─────────────── -->
+      <div class="auth-form" id="form-signup">
+
+        <!-- Verify-email waiting screen -->
+        <div class="verify-state" id="verify-state">
+          <div class="verify-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
+          <div class="verify-title">আপনার ইনবক্স চেক করুন!</div>
+          <p class="verify-sub">
+            <strong id="verify-email-text"></strong> ঠিকানায় একটি ভেরিফিকেশন লিংক পাঠানো হয়েছে।
+            অ্যাকাউন্ট চালু করতে লিংকে ক্লিক করুন (স্প্যাম ফোল্ডারও দেখুন)। এরপর লগইন ট্যাব থেকে ইমেইল ও পাসওয়ার্ড দিয়ে লগইন করুন।
+          </p>
+          <button type="button" class="resend-btn" id="resend-btn">
+            <i class="fa-solid fa-rotate"></i> আবার পাঠান
+          </button>
+          <p id="resend-cooldown" class="cooldown-note"></p>
+          <div id="resend-msg" class="msg-bar" style="margin-top:10px;"></div>
+
+          <button type="button" class="btn btn-primary btn-block" id="go-to-login-btn" style="margin-top:18px;">
+            <i class="fa-solid fa-right-to-bracket"></i> লগইনে যান
+          </button>
+        </div>
+
+        <!-- Signup fields -->
+        <div id="signup-fields">
+          <div class="form-group">
+            <label class="form-label" for="signup-name">পূর্ণ নাম</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-user"></i>
+              <input class="form-input" type="text" id="signup-name" placeholder="আপনার নাম" autocomplete="name">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="signup-email">ইমেইল</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-envelope"></i>
+              <input class="form-input" type="email" id="signup-email" placeholder="you@example.com" autocomplete="email">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="signup-phone">ফোন নম্বর <span style="font-weight:400; opacity:.7;">(ঐচ্ছিক)</span></label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-phone"></i>
+              <input class="form-input" type="tel" id="signup-phone" placeholder="01XXXXXXXXX" autocomplete="tel">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="signup-password">পাসওয়ার্ড</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-lock"></i>
+              <input class="form-input" type="password" id="signup-password" placeholder="ন্যূনতম ৮ ক্যারেক্টার" autocomplete="new-password">
+              <button type="button" class="eye-btn" id="signup-eye-btn" tabindex="-1"><i class="fa-solid fa-eye"></i></button>
+            </div>
+            <div class="pwd-strength" id="pwd-strength">
+              <div class="pwd-bars">
+                <div class="pwd-bar" id="bar1"></div>
+                <div class="pwd-bar" id="bar2"></div>
+                <div class="pwd-bar" id="bar3"></div>
+                <div class="pwd-bar" id="bar4"></div>
+              </div>
+              <span class="pwd-label" id="pwd-label"></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="signup-confirm">পাসওয়ার্ড আবার লিখুন</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-shield-halved"></i>
+              <input class="form-input" type="password" id="signup-confirm" placeholder="পাসওয়ার্ড আবার লিখুন" autocomplete="new-password">
+              <button type="button" class="eye-btn" id="signup-confirm-eye-btn" tabindex="-1"><i class="fa-solid fa-eye"></i></button>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-primary btn-block" id="signup-btn">
+            <i class="fa-solid fa-user-plus"></i> অ্যাকাউন্ট তৈরি করুন
+          </button>
+
+          <div id="signup-msg" class="msg-bar"></div>
+
+          <div class="auth-divider">অথবা</div>
+
+          <button type="button" class="google-btn" id="signup-google-btn">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23EA4335' d='M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z'/%3E%3Cpath fill='%234285F4' d='M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z'/%3E%3Cpath fill='%23FBBC05' d='M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z'/%3E%3Cpath fill='%2334A853' d='M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z'/%3E%3C/svg%3E" alt="Google">
+            Google দিয়ে চালিয়ে যান
+          </button>
+        </div><!-- /signup-fields -->
+      </div><!-- /form-signup -->
+
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+
+  <script type="module">
+    import {
+      loginWithEmail, signupWithEmail, loginWithGoogle,
+      resetPassword, getResetCooldownRemaining, resendVerificationEmail
+    } from './js/customer-auth.js';
+
+    // ---------- Tabs ----------
+    const tabLogin = document.getElementById('tab-login');
+    const tabSignup = document.getElementById('tab-signup');
+    const formLogin = document.getElementById('form-login');
+    const formSignup = document.getElementById('form-signup');
+    const formForgot = document.getElementById('form-forgot');
+
+    function switchTab(tab) {
+      formLogin.classList.toggle('active', tab === 'login');
+      formSignup.classList.toggle('active', tab === 'signup');
+      tabLogin.classList.toggle('active', tab === 'login');
+      tabSignup.classList.toggle('active', tab === 'signup');
+      formForgot.classList.remove('active');
+      clearInterval(forgotCountdownInterval);
+      clearMsg('login-msg');
+      clearMsg('signup-msg');
+      clearMsg('forgot-msg');
+    }
+    tabLogin.addEventListener('click', () => switchTab('login'));
+    tabSignup.addEventListener('click', () => switchTab('signup'));
+
+    // ---------- Message helpers ----------
+    function showMsg(id, type, icon, text) {
+      const el = document.getElementById(id);
+      el.className = `msg-bar show ${type}`;
+      el.innerHTML = `<i class="${icon}${type === 'loading' ? ' spin' : ''}"></i><span>${text}</span>`;
+    }
+    function clearMsg(id) {
+      const el = document.getElementById(id);
+      el.className = 'msg-bar';
+      el.innerHTML = '';
+    }
+
+    // ---------- Password eye toggles ----------
+    function wireEyeToggle(btnId, inputId) {
+      document.getElementById(btnId).addEventListener('click', () => {
+        const input = document.getElementById(inputId);
+        const icon = document.querySelector(`#${btnId} i`);
+        if (input.type === 'password') {
+          input.type = 'text';
+          icon.className = 'fa-solid fa-eye-slash';
+        } else {
+          input.type = 'password';
+          icon.className = 'fa-solid fa-eye';
+        }
+      });
+    }
+    wireEyeToggle('login-eye-btn', 'login-password');
+    wireEyeToggle('signup-eye-btn', 'signup-password');
+    wireEyeToggle('signup-confirm-eye-btn', 'signup-confirm');
+
+    // ---------- Password strength meter ----------
+    const pwdStrength = document.getElementById('pwd-strength');
+    const pwdLabel = document.getElementById('pwd-label');
+    const bars = ['bar1', 'bar2', 'bar3', 'bar4'].map((id) => document.getElementById(id));
+    document.getElementById('signup-password').addEventListener('input', (e) => {
+      const val = e.target.value;
+      pwdStrength.classList.toggle('show', val.length > 0);
+      let score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+      const colors = ['#B91C1C', '#A9871C', '#C9A227', '#2E7D46'];
+      const labels = ['দুর্বল', 'মোটামুটি', 'ভালো', 'শক্তিশালী'];
+      bars.forEach((b, i) => { b.style.background = i < score ? colors[score - 1] : ''; });
+      pwdLabel.textContent = labels[score - 1] || '';
+      pwdLabel.style.color = colors[score - 1] || 'var(--color-text-muted)';
+    });
+
+    function validEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+    // ---------- Friendly error mapper ----------
+    function friendlyAuthError(err) {
+      const map = {
+        'auth/wrong-password': 'পাসওয়ার্ড সঠিক নয়। আবার চেষ্টা করুন।',
+        'auth/invalid-credential': 'ইমেইল বা পাসওয়ার্ড সঠিক নয়। আবার চেষ্টা করুন।',
+        'auth/user-not-found': 'এই ইমেইলে কোনো অ্যাকাউন্ট পাওয়া যায়নি।',
+        'auth/email-not-verified': 'লগইন করার আগে আপনার ইমেইল ভেরিফাই করুন।',
+        'auth/too-many-requests': 'অনেকবার চেষ্টা হয়েছে। একটু পরে আবার চেষ্টা করুন।',
+        'auth/invalid-email': 'সঠিক ইমেইল ঠিকানা দিন।',
+        'auth/network-request-failed': 'নেটওয়ার্ক সমস্যা। সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।',
+        'auth/email-already-in-use': 'এই ইমেইল দিয়ে ইতিমধ্যে অ্যাকাউন্ট আছে।',
+        'auth/weak-password': 'আরেকটু শক্তিশালী পাসওয়ার্ড দিন।',
+        'auth/popup-closed-by-user': 'সাইন-ইন উইন্ডো বন্ধ হয়ে গেছে।',
+        'auth/cancelled-popup-request': 'সাইন-ইন বাতিল হয়েছে।',
+        'auth/user-disabled': 'এই অ্যাকাউন্টটি নিষ্ক্রিয় করা হয়েছে।'
+      };
+      return map[err.code] || 'কিছু একটা সমস্যা হয়েছে। আবার চেষ্টা করুন।';
+    }
+
+    // ---------- Login ----------
+    document.getElementById('login-btn').addEventListener('click', async () => {
+      clearMsg('login-msg');
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+
+      if (!validEmail(email)) return showMsg('login-msg', 'error', 'fa-solid fa-circle-exclamation', 'সঠিক ইমেইল ঠিকানা দিন।');
+      if (!password) return showMsg('login-msg', 'error', 'fa-solid fa-circle-exclamation', 'পাসওয়ার্ড দিন।');
+
+      const btn = document.getElementById('login-btn');
+      btn.disabled = true;
+      showMsg('login-msg', 'loading', 'fa-solid fa-spinner', 'লগইন হচ্ছে…');
+
+      try {
+        await loginWithEmail(email, password);
+        window.location.href = 'index.html';
+      } catch (err) {
+        console.error(err);
+        showMsg('login-msg', 'error', 'fa-solid fa-circle-exclamation', friendlyAuthError(err));
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ---------- Google ----------
+    async function handleGoogle(msgId) {
+      clearMsg(msgId);
+      try {
+        await loginWithGoogle();
+        window.location.href = 'index.html';
+      } catch (err) {
+        console.error(err);
+        showMsg(msgId, 'error', 'fa-solid fa-circle-exclamation', friendlyAuthError(err));
+      }
+    }
+    document.getElementById('login-google-btn').addEventListener('click', () => handleGoogle('login-msg'));
+    document.getElementById('signup-google-btn').addEventListener('click', () => handleGoogle('signup-msg'));
+
+    // ---------- Forgot password ----------
+    let forgotCountdownInterval = null;
+    function formatRemaining(ms) {
+      const totalSec = Math.ceil(ms / 1000);
+      const m = Math.floor(totalSec / 60);
+      const s = totalSec % 60;
+      return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+    function startForgotCountdown(remainingMs) {
+      const timerEl = document.getElementById('forgot-cooldown');
+      const btn = document.getElementById('forgot-btn');
+      btn.disabled = true;
+      timerEl.style.display = 'block';
+      let remaining = remainingMs;
+      clearInterval(forgotCountdownInterval);
+      const tick = () => {
+        if (remaining <= 0) {
+          clearInterval(forgotCountdownInterval);
+          timerEl.style.display = 'none';
+          btn.disabled = false;
+          return;
+        }
+        timerEl.textContent = `আবার পাঠানোর জন্য অপেক্ষা করুন ${formatRemaining(remaining)}`;
+        remaining -= 1000;
+      };
+      tick();
+      forgotCountdownInterval = setInterval(tick, 1000);
+    }
+
+    document.getElementById('open-forgot').addEventListener('click', async (e) => {
+      e.preventDefault();
+      formLogin.classList.remove('active');
+      formForgot.classList.add('active');
+      const loginEmail = document.getElementById('login-email').value.trim();
+      if (loginEmail) document.getElementById('forgot-email').value = loginEmail;
+      clearMsg('forgot-msg');
+      if (loginEmail && validEmail(loginEmail)) {
+        try {
+          const remaining = await getResetCooldownRemaining(loginEmail);
+          if (remaining > 0) startForgotCountdown(remaining);
+        } catch {}
+      }
+    });
+
+    document.getElementById('close-forgot').addEventListener('click', () => {
+      formForgot.classList.remove('active');
+      formLogin.classList.add('active');
+      clearMsg('forgot-msg');
+      clearInterval(forgotCountdownInterval);
+    });
+
+    document.getElementById('forgot-btn').addEventListener('click', async () => {
+      clearMsg('forgot-msg');
+      const email = document.getElementById('forgot-email').value.trim();
+      if (!validEmail(email)) return showMsg('forgot-msg', 'error', 'fa-solid fa-circle-exclamation', 'সঠিক ইমেইল ঠিকানা দিন।');
+
+      const btn = document.getElementById('forgot-btn');
+      btn.disabled = true;
+      showMsg('forgot-msg', 'loading', 'fa-solid fa-spinner', 'পাঠানো হচ্ছে…');
+
+      try {
+        await resetPassword(email);
+        showMsg('forgot-msg', 'success', 'fa-solid fa-circle-check', 'রিসেট লিংক পাঠানো হয়েছে। ইনবক্স চেক করুন।');
+        startForgotCountdown(5 * 60 * 1000);
+      } catch (err) {
+        console.error(err);
+        if (err.code === 'auth/reset-cooldown') {
+          showMsg('forgot-msg', 'error', 'fa-solid fa-clock', 'একটু আগেই লিংক পাঠানো হয়েছে।');
+          startForgotCountdown(err.remainingMs);
+        } else {
+          showMsg('forgot-msg', 'error', 'fa-solid fa-circle-exclamation', friendlyAuthError(err));
+          btn.disabled = false;
+        }
+      }
+    });
+
+    // ---------- Signup ----------
+    document.getElementById('signup-btn').addEventListener('click', async () => {
+      clearMsg('signup-msg');
+      const name = document.getElementById('signup-name').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const phone = document.getElementById('signup-phone').value.trim();
+      const password = document.getElementById('signup-password').value;
+      const confirm = document.getElementById('signup-confirm').value;
+
+      if (!name) return showMsg('signup-msg', 'error', 'fa-solid fa-circle-exclamation', 'আপনার নাম দিন।');
+      if (!validEmail(email)) return showMsg('signup-msg', 'error', 'fa-solid fa-circle-exclamation', 'সঠিক ইমেইল ঠিকানা দিন।');
+      if (password.length < 8) return showMsg('signup-msg', 'error', 'fa-solid fa-circle-exclamation', 'পাসওয়ার্ড কমপক্ষে ৮ ক্যারেক্টার হতে হবে।');
+      if (password !== confirm) return showMsg('signup-msg', 'error', 'fa-solid fa-circle-exclamation', 'দুটো পাসওয়ার্ড মিলছে না।');
+
+      const btn = document.getElementById('signup-btn');
+      btn.disabled = true;
+      showMsg('signup-msg', 'loading', 'fa-solid fa-spinner', 'অ্যাকাউন্ট তৈরি হচ্ছে…');
+
+      try {
+        const user = await signupWithEmail(name, email, phone, password);
+        document.getElementById('signup-fields').style.display = 'none';
+        document.getElementById('verify-email-text').textContent = user.email;
+        document.getElementById('verify-state').classList.add('show');
+      } catch (err) {
+        console.error(err);
+        showMsg('signup-msg', 'error', 'fa-solid fa-circle-exclamation', friendlyAuthError(err));
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ---------- Resend verification ----------
+    let resendCountdownInterval = null;
+    function startResendCountdown(remainingMs) {
+      const timerEl = document.getElementById('resend-cooldown');
+      const btn = document.getElementById('resend-btn');
+      btn.disabled = true;
+      timerEl.style.display = 'block';
+      let remaining = remainingMs;
+      clearInterval(resendCountdownInterval);
+      const tick = () => {
+        if (remaining <= 0) {
+          clearInterval(resendCountdownInterval);
+          timerEl.style.display = 'none';
+          btn.disabled = false;
+          return;
+        }
+        timerEl.textContent = `আবার পাঠানোর জন্য অপেক্ষা করুন ${formatRemaining(remaining)}`;
+        remaining -= 1000;
+      };
+      tick();
+      resendCountdownInterval = setInterval(tick, 1000);
+    }
+    document.getElementById('resend-btn').addEventListener('click', async () => {
+      clearMsg('resend-msg');
+      try {
+        await resendVerificationEmail();
+        showMsg('resend-msg', 'success', 'fa-solid fa-circle-check', 'আবার পাঠানো হয়েছে।');
+        startResendCountdown(5 * 60 * 1000);
+      } catch (err) {
+        console.error(err);
+        if (err.code === 'auth/reset-cooldown') {
+          showMsg('resend-msg', 'error', 'fa-solid fa-clock', 'একটু আগেই পাঠানো হয়েছে।');
+          startResendCountdown(err.remainingMs);
+        } else {
+          showMsg('resend-msg', 'error', 'fa-solid fa-circle-exclamation', friendlyAuthError(err));
+        }
+      }
+    });
+    document.getElementById('go-to-login-btn').addEventListener('click', () => switchTab('login'));
+  </script>
+  <script type="module" src="js/footer.js"></script>
+</body>
+</html>
