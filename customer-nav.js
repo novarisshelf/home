@@ -1,4 +1,4 @@
-// js/customer-nav.js
+// customer-nav.js
 // Lightweight per-page navbar widget for customer login state. Shows a
 // "লগইন" link when signed out, or the customer's name + "আমার অর্ডার" +
 // logout when signed in (and email-verified). Also triggers a one-time

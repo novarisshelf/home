@@ -1,7 +1,7 @@
-// js/admin.js
+// admin.js
 // Firestore CRUD for the live book catalog — this is the "switch from static
 // array to live Firestore" step. Once real books exist here, update
-// js/books.js to read from Firestore too (see the TODO at the top of that file).
+// books.js to read from Firestore too (see the TODO at the top of that file).
 
 import { db } from './firebase-config.js';
 import {

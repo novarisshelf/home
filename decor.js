@@ -1,10 +1,10 @@
-// js/decor.js
+// decor.js
 // Live catalog for the "Home Decor" section — two categories:
 // "Hobby & Collectibles" and "ঘর সাজানোর জিনিস" (home decoration items).
 // Reads from Firestore's "decorItems" collection (a separate collection from
-// "books", written to by admin-decor.html / js/admin-decor.js).
+// "books", written to by admin-decor.html / admin-decor.js).
 //
-// Same live/fallback pattern as js/books.js: if Firestore isn't reachable
+// Same live/fallback pattern as books.js: if Firestore isn't reachable
 // yet, or "decorItems" is empty, a small local placeholder catalog is used
 // instead so the Home Decor section still works with zero setup.
 

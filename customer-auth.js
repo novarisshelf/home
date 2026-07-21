@@ -1,5 +1,5 @@
-// js/customer-auth.js
-// Customer-facing authentication — separate from js/auth.js, which is the
+// customer-auth.js
+// Customer-facing authentication — separate from auth.js, which is the
 // single owner/admin account gate for dashboard.html/admin.html. Any visitor
 // can sign up here; login is optional site-wide, but required to view
 // my-orders.html and to have the cart sync to Firestore across devices.

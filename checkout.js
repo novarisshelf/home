@@ -1,4 +1,4 @@
-// js/checkout.js
+// checkout.js
 // On "Place Order": 1) email the order via EmailJS  2) save it to Firestore
 // 3) clear the local cart  4) let cart.html show the confirmation message.
 //

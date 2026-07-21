@@ -1,4 +1,4 @@
-// js/books.js
+// books.js
 // Live book catalog — reads from Firestore (the same "books" collection that
 // admin.html writes to), so books added/edited/deleted in the admin panel
 // show up here automatically.

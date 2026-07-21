@@ -1,10 +1,10 @@
-// js/cart.js
+// cart.js
 // Cart state, persisted in localStorage under the "novaris_cart" key.
 // Structure: [{ itemId, itemType, title, price, qty }]
 // itemType is 'book' or 'decor' — this is what lets a single cart hold both
-// books (from js/books.js) and Home Decor items (from js/decor.js) together.
+// books (from books.js) and Home Decor items (from decor.js) together.
 //
-// If a customer is logged in (js/customer-auth.js), the cart is also
+// If a customer is logged in (customer-auth.js), the cart is also
 // best-effort synced to their customers/{uid} Firestore doc, so it carries
 // over between devices. This is loaded lazily and wrapped in try/catch so
 // guest browsing (or a site where Firebase isn't set up yet) still works
@@ -50,7 +50,7 @@ async function syncCartToFirestore(cart) {
 }
 
 /**
- * Call once per page load after login state is known (js/customer-nav.js
+ * Call once per page load after login state is known (customer-nav.js
  * does this). If the customer has a cart saved in Firestore, merges it into
  * the local cart (higher quantity wins per item) and re-saves.
  */
