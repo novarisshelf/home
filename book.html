@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Novaris — বইয়ের বিস্তারিত</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
@@ -35,8 +35,8 @@
   <div class="toast" id="toast"></div>
 
   <script type="module">
-    import { getBookById } from './js/books.js';
-    import { addToCart, renderCartBadge } from './js/cart.js';
+    import { getBookById } from './books.js';
+    import { addToCart, renderCartBadge } from './cart.js';
 
     const params = new URLSearchParams(window.location.search);
     const bookId = params.get('id');
@@ -116,7 +116,7 @@
 
     renderCartBadge();
   </script>
-  <script type="module" src="js/customer-nav.js"></script>
-  <script type="module" src="js/footer.js"></script>
+  <script type="module" src="customer-nav.js"></script>
+  <script type="module" src="footer.js"></script>
 </body>
 </html>

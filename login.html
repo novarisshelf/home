@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novaris — লগইন</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="navbar-brand">Novaris</a>
+    </div>
+  </nav>
+
+  <div class="auth-wrap">
+    <div class="card auth-card">
+      <h1>মালিক লগইন</h1>
+      <p class="auth-subtitle">অর্ডার ও বই পরিচালনা করতে লগইন করুন</p>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="login-email">ইমেইল</label>
+          <input class="form-input" type="email" id="login-email" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="login-password">পাসওয়ার্ড</label>
+          <input class="form-input" type="password" id="login-password" required autocomplete="current-password">
+        </div>
+        <p class="form-error" id="login-error" style="display:none;"></p>
+        <button type="submit" class="btn btn-primary btn-block" id="login-btn">
+          <i class="fa-solid fa-right-to-bracket"></i> লগইন করুন
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+
+  <script type="module">
+    import { loginUser } from './auth.js';
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const errorEl = document.getElementById('login-error');
+      const btn = document.getElementById('login-btn');
+
+      btn.disabled = true;
+      btn.textContent = 'লগইন হচ্ছে…';
+      errorEl.style.display = 'none';
+
+      try {
+        await loginUser(email, password);
+        window.location.href = 'dashboard.html';
+      } catch (err) {
+        console.error(err);
+        errorEl.textContent = 'ইমেইল বা পাসওয়ার্ড সঠিক নয়।';
+        errorEl.style.display = 'block';
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> লগইন করুন';
+      }
+    });
+  </script>
+  <script type="module" src="footer.js"></script>
+</body>
+</html>

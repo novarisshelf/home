@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Novaris — কার্ট</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
@@ -83,7 +83,7 @@
   <script type="module">
     import {
       getCart, removeFromCart, updateCartItemQty, getCartTotal, renderCartBadge
-    } from './js/cart.js';
+    } from './cart.js';
     // checkout.js pulls in Firebase, so it's loaded lazily on submit — the
     // cart itself (view/edit/remove) never depends on Firebase being reachable.
 
@@ -173,7 +173,7 @@
     renderCart();
     renderCartBadge();
   </script>
-  <script type="module" src="js/customer-nav.js"></script>
-  <script type="module" src="js/footer.js"></script>
+  <script type="module" src="customer-nav.js"></script>
+  <script type="module" src="footer.js"></script>
 </body>
 </html>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Novaris — বই ও ঘর সাজানোর জিনিসপত্র</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
@@ -67,9 +67,9 @@
   <div id="site-footer"></div>
 
   <script type="module">
-    import { getGenres, getRandomBooksByGenre, getAllBooks, createBookCard } from './js/books.js';
-    import { getDecorCategories, getRandomDecorItemsByCategory, getAllDecorItems, createDecorCard } from './js/decor.js';
-    import { renderCartBadge } from './js/cart.js';
+    import { getGenres, getRandomBooksByGenre, getAllBooks, createBookCard } from './books.js';
+    import { getDecorCategories, getRandomDecorItemsByCategory, getAllDecorItems, createDecorCard } from './decor.js';
+    import { renderCartBadge } from './cart.js';
 
     const catalogSections = document.getElementById('catalog-sections');
     const booksMain = document.getElementById('genre-sections');
@@ -197,7 +197,7 @@
 
     init();
   </script>
-  <script type="module" src="js/customer-nav.js"></script>
-  <script type="module" src="js/footer.js"></script>
+  <script type="module" src="customer-nav.js"></script>
+  <script type="module" src="footer.js"></script>
 </body>
 </html>
