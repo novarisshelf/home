@@ -15,10 +15,10 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 import { getCart, getCartTotal, clearCart } from './cart.js';
 
-const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID';
-const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
-const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY';
-const OWNER_EMAIL = 'owner@novaris.example.com'; // TODO: Munan's real email
+const EMAILJS_SERVICE_ID = 'Orderinfo';
+const EMAILJS_TEMPLATE_ID = 'template_o6asc2f';
+const EMAILJS_PUBLIC_KEY = 'R-alEt5ko4W0XtxZJ';
+const OWNER_EMAIL = 'novarisshelf@gmail.com';
 
 if (typeof emailjs !== 'undefined') {
   emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
