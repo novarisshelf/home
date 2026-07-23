@@ -13,7 +13,6 @@
     <div class="navbar-inner">
       <a href="index.html" class="navbar-brand">Novaris</a>
       <div class="navbar-links">
-        <a href="index.html#home-decor">Home Decor</a>
         <span id="customer-nav-slot" class="navbar-account"></span>
         <a href="cart.html" class="navbar-cart" aria-label="কার্ট">
           <i class="fa-solid fa-cart-shopping"></i>
@@ -84,7 +83,15 @@
 
             <div class="detail-actions">
               ${item.inStock ? `
-                <input type="number" id="qty-input" class="form-input qty-input" value="1" min="1">
+                <div class="qty-stepper" id="add-qty-stepper">
+                  <button type="button" class="qty-btn qty-minus" aria-label="কমান" disabled>
+                    <i class="fa-solid fa-minus"></i>
+                  </button>
+                  <span class="qty-value" id="add-qty-value">1</span>
+                  <button type="button" class="qty-btn qty-plus" aria-label="বাড়ান">
+                    <i class="fa-solid fa-plus"></i>
+                  </button>
+                </div>
                 <button id="add-to-cart-btn" class="btn btn-primary">
                   <i class="fa-solid fa-cart-plus"></i> কার্টে যোগ করুন
                 </button>
@@ -96,11 +103,29 @@
         </div>
       `;
 
+      let addQty = 1;
+      const stepper = document.getElementById('add-qty-stepper');
+      if (stepper) {
+        const qtyValueEl = document.getElementById('add-qty-value');
+        const minusBtn = stepper.querySelector('.qty-minus');
+        const plusBtn = stepper.querySelector('.qty-plus');
+        minusBtn.addEventListener('click', () => {
+          if (addQty <= 1) return;
+          addQty -= 1;
+          qtyValueEl.textContent = addQty;
+          minusBtn.disabled = addQty <= 1;
+        });
+        plusBtn.addEventListener('click', () => {
+          addQty += 1;
+          qtyValueEl.textContent = addQty;
+          minusBtn.disabled = false;
+        });
+      }
+
       const addBtn = document.getElementById('add-to-cart-btn');
       if (addBtn) {
         addBtn.addEventListener('click', () => {
-          const qty = parseInt(document.getElementById('qty-input').value, 10) || 1;
-          addToCart(item, 'decor', qty);
+          addToCart(item, 'decor', addQty);
           showToast('কার্টে যোগ করা হয়েছে ✓');
         });
       }

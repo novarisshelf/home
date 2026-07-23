@@ -14,7 +14,6 @@
     <div class="navbar-inner">
       <a href="index.html" class="navbar-brand">Novaris</a>
       <div class="navbar-links">
-        <a href="index.html#home-decor">Home Decor</a>
         <span id="customer-nav-slot" class="navbar-account"></span>
         <a href="cart.html" class="navbar-cart" aria-label="কার্ট">
           <i class="fa-solid fa-cart-shopping"></i>
@@ -111,7 +110,15 @@
             <p class="cart-item-title">${item.title}</p>
             <p class="cart-item-price">৳${item.price} × ${item.qty}</p>
           </div>
-          <input type="number" class="form-input qty-input qty-field" min="1" value="${item.qty}" data-item-id="${item.itemId}" data-item-type="${item.itemType}">
+          <div class="qty-stepper" data-item-id="${item.itemId}" data-item-type="${item.itemType}">
+            <button type="button" class="qty-btn qty-minus" aria-label="কমান" ${item.qty <= 1 ? 'disabled' : ''}>
+              <i class="fa-solid fa-minus"></i>
+            </button>
+            <span class="qty-value">${item.qty}</span>
+            <button type="button" class="qty-btn qty-plus" aria-label="বাড়ান">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
           <span class="price-current">৳${item.price * item.qty}</span>
           <button class="icon-btn danger remove-btn" data-item-id="${item.itemId}" data-item-type="${item.itemType}" aria-label="সরিয়ে ফেলুন">
             <i class="fa-solid fa-trash"></i>
@@ -119,9 +126,21 @@
         </div>
       `).join('');
 
-      itemsCard.querySelectorAll('.qty-field').forEach((input) => {
-        input.addEventListener('change', (e) => {
-          updateCartItemQty(e.target.dataset.itemId, e.target.dataset.itemType, parseInt(e.target.value, 10));
+      itemsCard.querySelectorAll('.qty-minus').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          const wrap = e.currentTarget.closest('.qty-stepper');
+          const item = getCart().find((i) => i.itemId === wrap.dataset.itemId && i.itemType === wrap.dataset.itemType);
+          if (!item || item.qty <= 1) return;
+          updateCartItemQty(wrap.dataset.itemId, wrap.dataset.itemType, item.qty - 1);
+          renderCart();
+        });
+      });
+      itemsCard.querySelectorAll('.qty-plus').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          const wrap = e.currentTarget.closest('.qty-stepper');
+          const item = getCart().find((i) => i.itemId === wrap.dataset.itemId && i.itemType === wrap.dataset.itemType);
+          if (!item) return;
+          updateCartItemQty(wrap.dataset.itemId, wrap.dataset.itemType, item.qty + 1);
           renderCart();
         });
       });

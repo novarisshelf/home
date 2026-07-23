@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- Books: anyone can read the catalog, only the owner can write ----
+    match /books/{bookId} {
+      allow read: if true;
+      allow write: if request.auth != null
+        && request.auth.token.email == "YOUR_OWNER_EMAIL";
+    }
+
+    // ---- Home decor items: same pattern as books ----
+    match /decorItems/{itemId} {
+      allow read: if true;
+      allow write: if request.auth != null
+        && request.auth.token.email == "YOUR_OWNER_EMAIL";
+    }
+
+    // ---- Customers: a signed-in customer can only read/write their own
+    // profile doc (id == their own uid). The owner can also read any of
+    // them (used by dashboard.html to show customer info on an order). ----
+    match /customers/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+      allow read: if request.auth != null
+        && request.auth.token.email == "YOUR_OWNER_EMAIL";
+    }
+
+    // ---- Orders: the owner can read/write everything (dashboard.html).
+    // A signed-in customer can create an order for themself and read only
+    // their own past orders (my-orders.html). Guest checkout (no login)
+    // can still create an order, since customerUid will be null on it. ----
+    match /orders/{orderId} {
+      allow read, write: if request.auth != null
+        && request.auth.token.email == "YOUR_OWNER_EMAIL";
+      allow read: if request.auth != null
+        && resource.data.customerUid == request.auth.uid;
+      allow create: if request.resource.data.customerUid == null
+        || (request.auth != null && request.resource.data.customerUid == request.auth.uid);
+    }
+  }
+}
