@@ -451,7 +451,7 @@ h3 { font-size: 1.15rem; }
   position: relative;
   border-radius: var(--radius-sm);
   overflow: hidden;
-  aspect-ratio: 2 / 3;
+  aspect-ratio: 2 / 2.5;
   margin-bottom: 10px;
   box-shadow: inset -6px 0 10px -6px rgba(43, 35, 32, 0.35);
 }
@@ -640,7 +640,7 @@ h3 { font-size: 1.15rem; }
   box-shadow: var(--shadow-md);
   box-shadow: inset -10px 0 16px -8px rgba(43, 35, 32, 0.4), var(--shadow-md);
   max-width: 300px;
-  aspect-ratio: 2 / 3;
+  aspect-ratio: 2 / 2.5;
 }
 .detail-cover-wrap img {
   width: 100%;
