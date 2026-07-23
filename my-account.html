@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novaris — আমার অ্যাকাউন্ট</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="navbar-brand">Novaris</a>
+      <div class="navbar-links">
+        <a href="index.html#home-decor">Home Decor</a>
+        <span id="customer-nav-slot" class="navbar-account"></span>
+        <a href="cart.html" class="navbar-cart" aria-label="কার্ট">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span class="cart-badge">0</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="account-wrap">
+
+    <div class="card profile-card">
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar" id="avatar">
+          <img id="avatar-img" alt="">
+          <span id="avatar-letter">?</span>
+        </div>
+      </div>
+      <h1 class="profile-name" id="profile-name">—</h1>
+      <p class="profile-email" id="profile-email">—</p>
+      <span class="provider-badge" id="provider-badge"><i class="fa-solid fa-envelope"></i> ইমেইল</span>
+
+      <div class="profile-divider"></div>
+
+      <div class="profile-stats">
+        <div class="profile-stat">
+          <div class="profile-stat-label">যোগ দিয়েছেন</div>
+          <div class="profile-stat-val" id="member-since">—</div>
+        </div>
+        <div class="profile-stat">
+          <div class="profile-stat-label">সর্বশেষ লগইন</div>
+          <div class="profile-stat-val" id="last-signin">—</div>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-danger btn-block" id="logout-btn">
+        <i class="fa-solid fa-right-from-bracket"></i> লগআউট
+      </button>
+    </div>
+
+    <p class="account-section-label">দ্রুত অ্যাক্সেস</p>
+    <div class="quick-grid">
+      <a href="my-orders.html" class="quick-card">
+        <div class="quick-card-icon"><i class="fa-solid fa-receipt"></i></div>
+        <div class="quick-card-title">আমার অর্ডার</div>
+        <div class="quick-card-desc">অর্ডার হিস্ট্রি দেখুন</div>
+      </a>
+      <a href="cart.html" class="quick-card">
+        <div class="quick-card-icon"><i class="fa-solid fa-cart-shopping"></i></div>
+        <div class="quick-card-title">কার্ট</div>
+        <div class="quick-card-desc">আপনার কার্ট দেখুন</div>
+      </a>
+      <a href="index.html" class="quick-card">
+        <div class="quick-card-icon"><i class="fa-solid fa-book"></i></div>
+        <div class="quick-card-title">বই দেখুন</div>
+        <div class="quick-card-desc">সব বই ব্রাউজ করুন</div>
+      </a>
+      <a href="index.html#home-decor" class="quick-card">
+        <div class="quick-card-icon"><i class="fa-solid fa-house-chimney-window"></i></div>
+        <div class="quick-card-title">Home Decor</div>
+        <div class="quick-card-desc">ঘর সাজানোর জিনিস দেখুন</div>
+      </a>
+    </div>
+
+  </div>
+
+  <div id="site-footer"></div>
+
+  <script type="module">
+    import { requireCustomerAuth, logoutCustomer } from './customer-auth.js';
+    import { renderCartBadge } from './cart.js';
+
+    // Redirects to account.html if not signed in / not verified.
+    const user = await requireCustomerAuth();
+
+    const name = user.displayName || (user.email ? user.email.split('@')[0] : 'কাস্টমার');
+    document.getElementById('profile-name').textContent = name;
+    document.getElementById('profile-email').textContent = user.email || '';
+
+    // Avatar: Google photo if available, otherwise first-letter fallback.
+    document.getElementById('avatar-letter').textContent = name.charAt(0).toUpperCase();
+    if (user.photoURL) {
+      const img = document.getElementById('avatar-img');
+      img.referrerPolicy = 'no-referrer';
+      img.src = user.photoURL;
+      img.onload = () => {
+        img.classList.add('loaded');
+        document.getElementById('avatar-letter').style.display = 'none';
+      };
+      img.onerror = () => { img.style.display = 'none'; };
+    }
+
+    // Provider badge.
+    const provider = user.providerData[0]?.providerId || 'password';
+    document.getElementById('provider-badge').innerHTML = provider === 'google.com'
+      ? '<i class="fa-brands fa-google"></i> Google'
+      : '<i class="fa-solid fa-envelope"></i> ইমেইল';
+
+    // Stats.
+    const fmt = (iso) => iso
+      ? new Date(iso).toLocaleDateString('bn-BD', { day: 'numeric', month: 'short', year: 'numeric' })
+      : '—';
+    document.getElementById('member-since').textContent = fmt(user.metadata?.creationTime);
+    document.getElementById('last-signin').textContent = fmt(user.metadata?.lastSignInTime);
+
+    // Logout.
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      await logoutCustomer();
+      window.location.href = 'index.html';
+    });
+
+    renderCartBadge();
+  </script>
+  <script type="module" src="customer-nav.js"></script>
+  <script type="module" src="footer.js"></script>
+</body>
+</html>
