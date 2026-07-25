@@ -9,6 +9,7 @@
 // instead so the Home Decor section still works with zero setup.
 
 import { db } from './firebase-config.js';
+import { t } from './i18n.js';
 import {
   collection,
   getDocs,
@@ -182,7 +183,7 @@ export function createDecorCard(item) {
   card.innerHTML = `
     <div class="book-card-cover-wrap">
       <img class="book-card-cover" src="${item.coverImage}" alt="${item.title}" loading="lazy">
-      ${!item.inStock ? '<span class="badge-outofstock">স্টক নেই</span>' : ''}
+      ${!item.inStock ? `<span class="badge-outofstock">${t('out_of_stock')}</span>` : ''}
     </div>
     <h3 class="book-card-title">${item.title}</h3>
     <p class="book-card-author">${item.material || item.category}</p>

@@ -11,17 +11,18 @@
 
 import { onCustomerAuthChanged } from './customer-auth.js';
 import { hydrateCartFromFirestoreIfLoggedIn } from './cart.js';
+import { t } from './i18n.js';
 
 const slot = document.getElementById('customer-nav-slot');
 
 function renderLoggedOut() {
   if (!slot) return;
-  slot.innerHTML = `<a href="account.html" class="nav-account-link"><i class="fa-solid fa-user"></i> লগইন</a>`;
+  slot.innerHTML = `<a href="account.html" class="nav-account-link"><i class="fa-solid fa-user"></i> ${t('nav_login')}</a>`;
 }
 
 function renderLoggedIn(user) {
   if (!slot) return;
-  slot.innerHTML = `<a href="my-account.html" class="nav-account-link"><i class="fa-solid fa-user"></i> ড্যাশবোর্ড</a>`;
+  slot.innerHTML = `<a href="my-account.html" class="nav-account-link"><i class="fa-solid fa-user"></i> ${t('nav_dashboard')}</a>`;
 }
 
 try {

@@ -8,13 +8,14 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
+  <script type="module" src="i18n.js"></script>
 
   <nav class="navbar">
     <div class="navbar-inner">
       <a href="index.html" class="navbar-brand">Novaris</a>
       <div class="navbar-links">
         <span id="customer-nav-slot" class="navbar-account"></span>
-        <a href="cart.html" class="navbar-cart" aria-label="কার্ট">
+        <a href="cart.html" class="navbar-cart" data-i18n-aria="nav_cart" aria-label="কার্ট">
           <i class="fa-solid fa-cart-shopping"></i>
           <span class="cart-badge">0</span>
         </a>
@@ -23,6 +24,30 @@
   </nav>
 
   <div class="account-wrap">
+
+    <div class="account-topbar">
+      <div class="settings-menu-wrap">
+        <button type="button" class="settings-trigger" id="settings-trigger" data-i18n-aria="settings_menu_label" aria-label="সেটিংস" aria-haspopup="true" aria-expanded="false">
+          <i class="fa-solid fa-ellipsis-vertical"></i>
+        </button>
+        <div class="settings-dropdown" id="settings-dropdown" hidden>
+          <div class="settings-group-label" data-i18n="settings_language">ভাষা</div>
+          <button type="button" class="settings-option" data-lang="bn">
+            <span data-i18n="settings_lang_bn">বাংলা</span>
+            <i class="fa-solid fa-check settings-check" id="check-bn"></i>
+          </button>
+          <button type="button" class="settings-option" data-lang="en">
+            <span data-i18n="settings_lang_en">English</span>
+            <i class="fa-solid fa-check settings-check" id="check-en"></i>
+          </button>
+          <div class="settings-divider"></div>
+          <div class="settings-option settings-option-disabled">
+            <span data-i18n="settings_theme">থিম</span>
+            <span class="settings-soon" data-i18n="settings_theme_soon">শীঘ্রই আসছে</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="card profile-card">
       <div class="profile-avatar-wrap">
@@ -39,41 +64,41 @@
 
       <div class="profile-stats">
         <div class="profile-stat">
-          <div class="profile-stat-label">যোগ দিয়েছেন</div>
+          <div class="profile-stat-label" data-i18n="account_dashboard_member_since">যোগ দিয়েছেন</div>
           <div class="profile-stat-val" id="member-since">—</div>
         </div>
         <div class="profile-stat">
-          <div class="profile-stat-label">সর্বশেষ লগইন</div>
+          <div class="profile-stat-label" data-i18n="account_dashboard_last_signin">সর্বশেষ লগইন</div>
           <div class="profile-stat-val" id="last-signin">—</div>
         </div>
       </div>
 
       <button type="button" class="btn btn-danger btn-block" id="logout-btn">
-        <i class="fa-solid fa-right-from-bracket"></i> লগআউট
+        <i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="account_dashboard_logout">লগআউট</span>
       </button>
     </div>
 
-    <p class="account-section-label">দ্রুত অ্যাক্সেস</p>
+    <p class="account-section-label" data-i18n="account_dashboard_quick_access">দ্রুত অ্যাক্সেস</p>
     <div class="quick-grid">
       <a href="my-orders.html" class="quick-card">
         <div class="quick-card-icon"><i class="fa-solid fa-receipt"></i></div>
-        <div class="quick-card-title">আমার অর্ডার</div>
-        <div class="quick-card-desc">অর্ডার হিস্ট্রি দেখুন</div>
+        <div class="quick-card-title" data-i18n="account_dashboard_orders">আমার অর্ডার</div>
+        <div class="quick-card-desc" data-i18n="account_dashboard_orders_desc">অর্ডার হিস্ট্রি দেখুন</div>
       </a>
       <a href="cart.html" class="quick-card">
         <div class="quick-card-icon"><i class="fa-solid fa-cart-shopping"></i></div>
-        <div class="quick-card-title">কার্ট</div>
-        <div class="quick-card-desc">আপনার কার্ট দেখুন</div>
+        <div class="quick-card-title" data-i18n="account_dashboard_cart">কার্ট</div>
+        <div class="quick-card-desc" data-i18n="account_dashboard_cart_desc">আপনার কার্ট দেখুন</div>
       </a>
       <a href="index.html" class="quick-card">
         <div class="quick-card-icon"><i class="fa-solid fa-book"></i></div>
-        <div class="quick-card-title">বই দেখুন</div>
-        <div class="quick-card-desc">সব বই ব্রাউজ করুন</div>
+        <div class="quick-card-title" data-i18n="account_dashboard_books">বই দেখুন</div>
+        <div class="quick-card-desc" data-i18n="account_dashboard_books_desc">সব বই ব্রাউজ করুন</div>
       </a>
       <a href="index.html#home-decor" class="quick-card">
         <div class="quick-card-icon"><i class="fa-solid fa-house-chimney-window"></i></div>
         <div class="quick-card-title">Home Decor</div>
-        <div class="quick-card-desc">ঘর সাজানোর জিনিস দেখুন</div>
+        <div class="quick-card-desc" data-i18n="account_dashboard_decor_desc">ঘর সাজানোর জিনিস দেখুন</div>
       </a>
     </div>
 
@@ -84,11 +109,37 @@
   <script type="module">
     import { requireCustomerAuth, logoutCustomer } from './customer-auth.js';
     import { renderCartBadge } from './cart.js';
+    import { getLang, setLang, t } from './i18n.js';
 
+    // ---------- Settings menu (3-dot: language now, theme later) ----------
+    const trigger = document.getElementById('settings-trigger');
+    const dropdown = document.getElementById('settings-dropdown');
+
+    function closeDropdown() {
+      dropdown.hidden = true;
+      trigger.setAttribute('aria-expanded', 'false');
+    }
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const willOpen = dropdown.hidden;
+      dropdown.hidden = !willOpen;
+      trigger.setAttribute('aria-expanded', String(willOpen));
+    });
+    dropdown.addEventListener('click', (e) => e.stopPropagation());
+    document.addEventListener('click', closeDropdown);
+
+    const currentLang = getLang();
+    document.getElementById(`check-${currentLang}`).classList.add('active');
+
+    document.querySelectorAll('.settings-option[data-lang]').forEach((btn) => {
+      btn.addEventListener('click', () => setLang(btn.dataset.lang));
+    });
+
+    // ---------- Profile ----------
     // Redirects to account.html if not signed in / not verified.
     const user = await requireCustomerAuth();
 
-    const name = user.displayName || (user.email ? user.email.split('@')[0] : 'কাস্টমার');
+    const name = user.displayName || (user.email ? user.email.split('@')[0] : t('account_default_name'));
     document.getElementById('profile-name').textContent = name;
     document.getElementById('profile-email').textContent = user.email || '';
 
@@ -109,11 +160,11 @@
     const provider = user.providerData[0]?.providerId || 'password';
     document.getElementById('provider-badge').innerHTML = provider === 'google.com'
       ? '<i class="fa-brands fa-google"></i> Google'
-      : '<i class="fa-solid fa-envelope"></i> ইমেইল';
+      : `<i class="fa-solid fa-envelope"></i> ${t('account_email')}`;
 
     // Stats.
     const fmt = (iso) => iso
-      ? new Date(iso).toLocaleDateString('bn-BD', { day: 'numeric', month: 'short', year: 'numeric' })
+      ? new Date(iso).toLocaleDateString(currentLang === 'bn' ? 'bn-BD' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' })
       : '—';
     document.getElementById('member-since').textContent = fmt(user.metadata?.creationTime);
     document.getElementById('last-signin').textContent = fmt(user.metadata?.lastSignInTime);
@@ -128,5 +179,6 @@
   </script>
   <script type="module" src="customer-nav.js"></script>
   <script type="module" src="footer.js"></script>
+  <script type="module" src="whatsapp-float.js"></script>
 </body>
 </html>

@@ -8,13 +8,14 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
+  <script type="module" src="i18n.js"></script>
 
   <nav class="navbar">
     <div class="navbar-inner">
       <a href="index.html" class="navbar-brand">Novaris</a>
       <div class="navbar-links">
         <span id="customer-nav-slot" class="navbar-account"></span>
-        <a href="cart.html" class="navbar-cart" aria-label="কার্ট">
+        <a href="cart.html" class="navbar-cart" data-i18n-aria="nav_cart" aria-label="কার্ট">
           <i class="fa-solid fa-cart-shopping"></i>
           <span class="cart-badge">0</span>
         </a>
@@ -23,7 +24,7 @@
   </nav>
 
   <div class="intro-strip">
-    <p>বই আর ঘর সাজানোর ছোট্ট জিনিসপত্র — সব একসাথে, একই তাকে।</p>
+    <p data-i18n="site_tagline">বই আর ঘর সাজানোর ছোট্ট জিনিসপত্র — সব একসাথে, একই তাকে।</p>
   </div>
 
   <div class="search-strip">
@@ -33,6 +34,7 @@
         type="text"
         id="search-input"
         class="search-box-input"
+        data-i18n-placeholder="search_placeholder"
         placeholder="বই, লেখক বা পণ্যের নাম লিখুন…"
         aria-label="খুঁজুন"
       >
@@ -44,7 +46,7 @@
 
   <div id="catalog-sections">
     <main id="genre-sections">
-      <p class="loading-state">বইয়ের তালিকা লোড হচ্ছে…</p>
+      <p class="loading-state" data-i18n="loading">বইয়ের তালিকা লোড হচ্ছে…</p>
     </main>
 
     <section id="home-decor">
@@ -53,7 +55,7 @@
         <p class="catalog-subheading">Hobby &amp; Collectibles আর ঘর সাজানোর জিনিস</p>
       </div>
       <div id="decor-sections">
-        <p class="loading-state">পণ্যের তালিকা লোড হচ্ছে…</p>
+        <p class="loading-state" data-i18n="loading">পণ্যের তালিকা লোড হচ্ছে…</p>
       </div>
     </section>
   </div>
@@ -68,13 +70,14 @@
   <script type="module">
     import { getGenres, getRandomBooksByGenre, getAllBooks, createBookCard } from './books.js';
     import { getDecorCategories, getRandomDecorItemsByCategory, getAllDecorItems, createDecorCard } from './decor.js';
+    import { t } from './i18n.js';
     import { renderCartBadge } from './cart.js';
 
     const catalogSections = document.getElementById('catalog-sections');
     const booksMain = document.getElementById('genre-sections');
     const decorSections = document.getElementById('decor-sections');
     const isDesktop = window.matchMedia('(min-width: 768px)').matches;
-    const countPerSection = isDesktop ? 6 : 2;
+    const countPerSection = isDesktop ? 3 : 2;
 
     const searchInput = document.getElementById('search-input');
     const clearBtn = document.getElementById('search-clear-btn');
@@ -86,22 +89,33 @@
       return (str || '').toLowerCase().trim();
     }
 
-    function buildShelves(container, categories, items, countPer, getRandomFn, createCardFn) {
+    function buildShelves(container, categories, items, countPer, getRandomFn, createCardFn, type) {
       categories.forEach((category) => {
         const section = document.createElement('section');
         section.className = 'genre-section';
+
+        const headingRow = document.createElement('div');
+        headingRow.className = 'section-title-row';
 
         const heading = document.createElement('h2');
         heading.className = 'section-title';
         heading.textContent = category;
 
+        const seeAllLink = document.createElement('a');
+        seeAllLink.className = 'see-all-link';
+        seeAllLink.href = `genre.html?type=${type}&key=${encodeURIComponent(category)}`;
+        seeAllLink.innerHTML = `${t('see_all')} <i class="fa-solid fa-chevron-right"></i>`;
+
+        headingRow.appendChild(heading);
+        headingRow.appendChild(seeAllLink);
+
         const grid = document.createElement('div');
-        grid.className = 'book-grid';
+        grid.className = 'book-grid shelf-grid';
         getRandomFn(items, category, countPer).forEach((item) => {
           grid.appendChild(createCardFn(item));
         });
 
-        section.appendChild(heading);
+        section.appendChild(headingRow);
         section.appendChild(grid);
         container.appendChild(section);
       });
@@ -130,7 +144,9 @@
         normalize(entry.material).includes(q)
       );
 
-      resultsTitle.textContent = `"${rawQuery}" এর জন্য ফলাফল (${matches.length})`;
+      resultsTitle.textContent = t('search_results_for')
+        .replace('{q}', rawQuery)
+        .replace('{n}', matches.length);
       resultsSection.querySelector('.empty-state')?.remove();
       resultsGrid.innerHTML = '';
 
@@ -138,7 +154,7 @@
         resultsSection.insertAdjacentHTML('beforeend', `
           <div class="empty-state">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <p>কিছু পাওয়া যায়নি। অন্য নাম দিয়ে খুঁজে দেখুন।</p>
+            <p>${t('empty_no_results')}</p>
           </div>
         `);
         return;
@@ -161,7 +177,7 @@
         booksMain.innerHTML = `
           <div class="empty-state">
             <i class="fa-solid fa-triangle-exclamation"></i>
-            <p>তালিকা লোড করা যায়নি। আবার চেষ্টা করুন।</p>
+            <p>${t('error_generic')}</p>
           </div>
         `;
         decorSections.innerHTML = '';
@@ -169,10 +185,10 @@
       }
 
       booksMain.innerHTML = '';
-      buildShelves(booksMain, getGenres(allBooks), allBooks, countPerSection, getRandomBooksByGenre, createBookCard);
+      buildShelves(booksMain, getGenres(allBooks), allBooks, countPerSection, getRandomBooksByGenre, createBookCard, 'book');
 
       decorSections.innerHTML = '';
-      buildShelves(decorSections, getDecorCategories(allDecorItems), allDecorItems, countPerSection, getRandomDecorItemsByCategory, createDecorCard);
+      buildShelves(decorSections, getDecorCategories(allDecorItems), allDecorItems, countPerSection, getRandomDecorItemsByCategory, createDecorCard, 'decor');
 
       renderCartBadge();
 
@@ -198,5 +214,6 @@
   </script>
   <script type="module" src="customer-nav.js"></script>
   <script type="module" src="footer.js"></script>
+  <script type="module" src="whatsapp-float.js"></script>
 </body>
 </html>

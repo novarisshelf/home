@@ -9,6 +9,7 @@
 // with zero setup. Once real books exist in Firestore, they take over.
 
 import { db } from './firebase-config.js';
+import { t } from './i18n.js';
 import {
   collection,
   getDocs,
@@ -341,7 +342,7 @@ export function createBookCard(book) {
   card.innerHTML = `
     <div class="book-card-cover-wrap">
       <img class="book-card-cover" src="${book.coverImage}" alt="${book.title}" loading="lazy">
-      ${!book.inStock ? '<span class="badge-outofstock">স্টক নেই</span>' : ''}
+      ${!book.inStock ? `<span class="badge-outofstock">${t('out_of_stock')}</span>` : ''}
     </div>
     <h3 class="book-card-title">${book.title}</h3>
     <p class="book-card-author">${book.author}</p>

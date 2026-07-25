@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novaris — সব দেখুন</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <script type="module" src="i18n.js"></script>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="navbar-brand">Novaris</a>
+      <div class="navbar-links">
+        <span id="customer-nav-slot" class="navbar-account"></span>
+        <a href="cart.html" class="navbar-cart" data-i18n-aria="nav_cart" aria-label="কার্ট">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span class="cart-badge">0</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <a href="index.html" class="back-link" data-i18n="back_home"><i class="fa-solid fa-arrow-left"></i> হোমে ফিরুন</a>
+
+    <h1 class="section-title" id="genre-title">—</h1>
+    <div class="book-grid" id="genre-grid">
+      <p class="loading-state" data-i18n="loading">লোড হচ্ছে…</p>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+
+  <script type="module">
+    import { getAllBooks, createBookCard } from './books.js';
+    import { getAllDecorItems, createDecorCard } from './decor.js';
+    import { renderCartBadge } from './cart.js';
+    import { t } from './i18n.js';
+
+    const params = new URLSearchParams(window.location.search);
+    const type = params.get('type') === 'decor' ? 'decor' : 'book';
+    const key = params.get('key') || '';
+
+    document.getElementById('genre-title').textContent = key;
+    document.title = `Novaris — ${key}`;
+
+    async function init() {
+      const grid = document.getElementById('genre-grid');
+      let items = [];
+      let createCard = createBookCard;
+
+      try {
+        if (type === 'decor') {
+          const allItems = await getAllDecorItems();
+          items = allItems.filter((i) => i.category === key);
+          createCard = createDecorCard;
+        } else {
+          const allBooks = await getAllBooks();
+          items = allBooks.filter((b) => b.genre === key);
+        }
+      } catch (err) {
+        console.error(err);
+        grid.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <p>${t('error_generic')}</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = '';
+      if (items.length === 0) {
+        grid.insertAdjacentHTML('afterend', `
+          <div class="empty-state">
+            <i class="fa-solid fa-box-open"></i>
+            <p>${t('empty_category')}</p>
+          </div>
+        `);
+      } else {
+        items.forEach((item) => grid.appendChild(createCard(item)));
+      }
+
+      renderCartBadge();
+    }
+
+    init();
+  </script>
+  <script type="module" src="customer-nav.js"></script>
+  <script type="module" src="footer.js"></script>
+  <script type="module" src="whatsapp-float.js"></script>
+</body>
+</html>

@@ -1,6 +1,8 @@
 // footer.js
 // Injects the shared footer into <div id="site-footer"></div> on every page.
 
+import { t } from './i18n.js';
+
 function renderFooter() {
   const container = document.getElementById('site-footer');
   if (!container) return;
@@ -22,7 +24,7 @@ function renderFooter() {
           <i class="fa-brands fa-whatsapp"></i> +৮৮০ ১৭৩২-৪১০৩৫৩
         </a>
       </p>
-      <p class="footer-copy">© ${year} Novaris — সর্বস্বত্ব সংরক্ষিত</p>
+      <p class="footer-copy">© ${year} Novaris — ${t('footer_rights')}</p>
     </div>
   `;
 }

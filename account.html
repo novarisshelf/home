@@ -8,12 +8,13 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
+  <script type="module" src="i18n.js"></script>
 
   <nav class="navbar">
     <div class="navbar-inner">
       <a href="index.html" class="navbar-brand">Novaris</a>
       <div class="navbar-links">
-        <a href="cart.html" class="navbar-cart" aria-label="কার্ট">
+        <a href="cart.html" class="navbar-cart" data-i18n-aria="nav_cart" aria-label="কার্ট">
           <i class="fa-solid fa-cart-shopping"></i>
           <span class="cart-badge">0</span>
         </a>
@@ -25,61 +26,61 @@
     <div class="card auth-card customer-auth-card">
 
       <div class="auth-tabs">
-        <button type="button" class="tab-btn active" id="tab-login">লগইন</button>
-        <button type="button" class="tab-btn" id="tab-signup">সাইন আপ</button>
+        <button type="button" class="tab-btn active" id="tab-login" data-i18n="account_login_title">লগইন</button>
+        <button type="button" class="tab-btn" id="tab-signup" data-i18n="account_signup_tab">সাইন আপ</button>
       </div>
 
       <!-- ─────────────── LOGIN FORM ─────────────── -->
       <div class="auth-form active" id="form-login">
         <div class="form-group">
-          <label class="form-label" for="login-email">ইমেইল</label>
+          <label class="form-label" for="login-email" data-i18n="account_email">ইমেইল</label>
           <div class="input-wrap">
             <i class="fa-solid fa-envelope"></i>
             <input class="form-input" type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label" for="login-password">পাসওয়ার্ড</label>
+          <label class="form-label" for="login-password" data-i18n="account_password">পাসওয়ার্ড</label>
           <div class="input-wrap">
             <i class="fa-solid fa-lock"></i>
-            <input class="form-input" type="password" id="login-password" placeholder="আপনার পাসওয়ার্ড" autocomplete="current-password">
+            <input class="form-input" type="password" id="login-password" data-i18n-placeholder="account_password_placeholder" placeholder="আপনার পাসওয়ার্ড" autocomplete="current-password">
             <button type="button" class="eye-btn" id="login-eye-btn" tabindex="-1"><i class="fa-solid fa-eye"></i></button>
           </div>
           <div style="text-align:right; margin-top:6px;">
-            <a href="#" id="open-forgot" style="font-size:.82rem; color:var(--color-primary); font-weight:600;">পাসওয়ার্ড ভুলে গেছেন?</a>
+            <a href="#" id="open-forgot" style="font-size:.82rem; color:var(--color-primary); font-weight:600;" data-i18n="account_forgot">পাসওয়ার্ড ভুলে গেছেন?</a>
           </div>
         </div>
 
         <button type="button" class="btn btn-primary btn-block" id="login-btn">
-          <i class="fa-solid fa-right-to-bracket"></i> লগইন করুন
+          <i class="fa-solid fa-right-to-bracket"></i> <span data-i18n="account_login_btn">লগইন করুন</span>
         </button>
 
         <div id="login-msg" class="msg-bar"></div>
 
-        <div class="auth-divider">অথবা</div>
+        <div class="auth-divider" data-i18n="account_or">অথবা</div>
 
         <button type="button" class="google-btn" id="login-google-btn">
           <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23EA4335' d='M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z'/%3E%3Cpath fill='%234285F4' d='M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z'/%3E%3Cpath fill='%23FBBC05' d='M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z'/%3E%3Cpath fill='%2334A853' d='M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z'/%3E%3C/svg%3E" alt="Google">
-          Google দিয়ে চালিয়ে যান
+          <span data-i18n="account_google">Google দিয়ে চালিয়ে যান</span>
         </button>
       </div><!-- /form-login -->
 
       <!-- ─────────────── FORGOT PASSWORD ─────────────── -->
       <div class="auth-form" id="form-forgot">
         <button type="button" id="close-forgot" style="background:none; border:none; color:var(--color-text-muted); font-size:.82rem; font-weight:600; margin-bottom:14px; display:flex; align-items:center; gap:6px; padding:0;">
-          <i class="fa-solid fa-arrow-left"></i> লগইনে ফিরুন
+          <i class="fa-solid fa-arrow-left"></i> <span data-i18n="account_back_to_login">লগইনে ফিরুন</span>
         </button>
 
-        <p style="font-size:.86rem; color:var(--color-text-muted); margin-bottom:10px; line-height:1.5;">
+        <p style="font-size:.86rem; color:var(--color-text-muted); margin-bottom:10px; line-height:1.5;" data-i18n="account_forgot_intro">
           আপনার ইমেইল দিন, আমরা পাসওয়ার্ড রিসেট করার লিংক পাঠিয়ে দেব।
         </p>
         <div class="info-note">
           <i class="fa-solid fa-circle-info"></i>
-          <p>Google দিয়ে সাইন আপ করেছেন? তাহলে <strong>Google দিয়ে চালিয়ে যান</strong> বাটন দিয়ে লগইন করুন — এখানে কোনো পাসওয়ার্ড রিসেট করার দরকার নেই।</p>
+          <p data-i18n-html="account_forgot_google_note">Google দিয়ে সাইন আপ করেছেন? তাহলে <strong>Google দিয়ে চালিয়ে যান</strong> বাটন দিয়ে লগইন করুন — এখানে কোনো পাসওয়ার্ড রিসেট করার দরকার নেই।</p>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="forgot-email">ইমেইল</label>
+          <label class="form-label" for="forgot-email" data-i18n="account_email">ইমেইল</label>
           <div class="input-wrap">
             <i class="fa-solid fa-envelope"></i>
             <input class="form-input" type="email" id="forgot-email" placeholder="you@example.com" autocomplete="email">
@@ -87,7 +88,7 @@
         </div>
 
         <button type="button" class="btn btn-primary btn-block" id="forgot-btn">
-          <i class="fa-solid fa-paper-plane"></i> রিসেট লিংক পাঠান
+          <i class="fa-solid fa-paper-plane"></i> <span data-i18n="account_send_reset">রিসেট লিংক পাঠান</span>
         </button>
 
         <p id="forgot-cooldown" class="cooldown-note"></p>
@@ -100,50 +101,50 @@
         <!-- Verify-email waiting screen -->
         <div class="verify-state" id="verify-state">
           <div class="verify-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
-          <div class="verify-title">আপনার ইনবক্স চেক করুন!</div>
-          <p class="verify-sub">
+          <div class="verify-title" data-i18n="account_check_inbox">আপনার ইনবক্স চেক করুন!</div>
+          <p class="verify-sub" id="verify-sub">
             <strong id="verify-email-text"></strong> ঠিকানায় একটি ভেরিফিকেশন লিংক পাঠানো হয়েছে।
             অ্যাকাউন্ট চালু করতে লিংকে ক্লিক করুন (স্প্যাম ফোল্ডারও দেখুন)। এরপর লগইন ট্যাব থেকে ইমেইল ও পাসওয়ার্ড দিয়ে লগইন করুন।
           </p>
           <button type="button" class="resend-btn" id="resend-btn">
-            <i class="fa-solid fa-rotate"></i> আবার পাঠান
+            <i class="fa-solid fa-rotate"></i> <span data-i18n="account_resend">আবার পাঠান</span>
           </button>
           <p id="resend-cooldown" class="cooldown-note"></p>
           <div id="resend-msg" class="msg-bar" style="margin-top:10px;"></div>
 
           <button type="button" class="btn btn-primary btn-block" id="go-to-login-btn" style="margin-top:18px;">
-            <i class="fa-solid fa-right-to-bracket"></i> লগইনে যান
+            <i class="fa-solid fa-right-to-bracket"></i> <span data-i18n="account_go_to_login">লগইনে যান</span>
           </button>
         </div>
 
         <!-- Signup fields -->
         <div id="signup-fields">
           <div class="form-group">
-            <label class="form-label" for="signup-name">পূর্ণ নাম</label>
+            <label class="form-label" for="signup-name" data-i18n="checkout_name_plain">পূর্ণ নাম</label>
             <div class="input-wrap">
               <i class="fa-solid fa-user"></i>
-              <input class="form-input" type="text" id="signup-name" placeholder="আপনার নাম" autocomplete="name">
+              <input class="form-input" type="text" id="signup-name" data-i18n-placeholder="account_your_name" placeholder="আপনার নাম" autocomplete="name">
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label" for="signup-email">ইমেইল</label>
+            <label class="form-label" for="signup-email" data-i18n="account_email">ইমেইল</label>
             <div class="input-wrap">
               <i class="fa-solid fa-envelope"></i>
               <input class="form-input" type="email" id="signup-email" placeholder="you@example.com" autocomplete="email">
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label" for="signup-phone">ফোন নম্বর <span style="font-weight:400; opacity:.7;">(ঐচ্ছিক)</span></label>
+            <label class="form-label" for="signup-phone"><span data-i18n="checkout_phone_plain">ফোন নম্বর</span> <span style="font-weight:400; opacity:.7;" data-i18n="account_optional">(ঐচ্ছিক)</span></label>
             <div class="input-wrap">
               <i class="fa-solid fa-phone"></i>
               <input class="form-input" type="tel" id="signup-phone" placeholder="01XXXXXXXXX" autocomplete="tel">
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label" for="signup-password">পাসওয়ার্ড</label>
+            <label class="form-label" for="signup-password" data-i18n="account_password">পাসওয়ার্ড</label>
             <div class="input-wrap">
               <i class="fa-solid fa-lock"></i>
-              <input class="form-input" type="password" id="signup-password" placeholder="ন্যূনতম ৮ ক্যারেক্টার" autocomplete="new-password">
+              <input class="form-input" type="password" id="signup-password" data-i18n-placeholder="account_min_chars" placeholder="ন্যূনতম ৮ ক্যারেক্টার" autocomplete="new-password">
               <button type="button" class="eye-btn" id="signup-eye-btn" tabindex="-1"><i class="fa-solid fa-eye"></i></button>
             </div>
             <div class="pwd-strength" id="pwd-strength">
@@ -157,25 +158,25 @@
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label" for="signup-confirm">পাসওয়ার্ড আবার লিখুন</label>
+            <label class="form-label" for="signup-confirm" data-i18n="account_confirm_password">পাসওয়ার্ড আবার লিখুন</label>
             <div class="input-wrap">
               <i class="fa-solid fa-shield-halved"></i>
-              <input class="form-input" type="password" id="signup-confirm" placeholder="পাসওয়ার্ড আবার লিখুন" autocomplete="new-password">
+              <input class="form-input" type="password" id="signup-confirm" data-i18n-placeholder="account_confirm_password" placeholder="পাসওয়ার্ড আবার লিখুন" autocomplete="new-password">
               <button type="button" class="eye-btn" id="signup-confirm-eye-btn" tabindex="-1"><i class="fa-solid fa-eye"></i></button>
             </div>
           </div>
 
           <button type="button" class="btn btn-primary btn-block" id="signup-btn">
-            <i class="fa-solid fa-user-plus"></i> অ্যাকাউন্ট তৈরি করুন
+            <i class="fa-solid fa-user-plus"></i> <span data-i18n="account_signup_btn">অ্যাকাউন্ট তৈরি করুন</span>
           </button>
 
           <div id="signup-msg" class="msg-bar"></div>
 
-          <div class="auth-divider">অথবা</div>
+          <div class="auth-divider" data-i18n="account_or">অথবা</div>
 
           <button type="button" class="google-btn" id="signup-google-btn">
             <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23EA4335' d='M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z'/%3E%3Cpath fill='%234285F4' d='M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z'/%3E%3Cpath fill='%23FBBC05' d='M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z'/%3E%3Cpath fill='%2334A853' d='M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z'/%3E%3C/svg%3E" alt="Google">
-            Google দিয়ে চালিয়ে যান
+            <span data-i18n="account_google">Google দিয়ে চালিয়ে যান</span>
           </button>
         </div><!-- /signup-fields -->
       </div><!-- /form-signup -->
@@ -190,6 +191,7 @@
       loginWithEmail, signupWithEmail, loginWithGoogle,
       resetPassword, getResetCooldownRemaining, resendVerificationEmail
     } from './customer-auth.js';
+    import { t } from './i18n.js';
 
     // ---------- Tabs ----------
     const tabLogin = document.getElementById('tab-login');
@@ -417,7 +419,8 @@
       try {
         const user = await signupWithEmail(name, email, phone, password);
         document.getElementById('signup-fields').style.display = 'none';
-        document.getElementById('verify-email-text').textContent = user.email;
+        document.getElementById('verify-sub').innerHTML =
+          `<strong id="verify-email-text">${user.email}</strong> ${t('account_verify_sub_rest')}`;
         document.getElementById('verify-state').classList.add('show');
       } catch (err) {
         console.error(err);
@@ -468,5 +471,6 @@
     document.getElementById('go-to-login-btn').addEventListener('click', () => switchTab('login'));
   </script>
   <script type="module" src="footer.js"></script>
+  <script type="module" src="whatsapp-float.js"></script>
 </body>
 </html>

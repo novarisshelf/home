@@ -8,82 +8,83 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
+  <script type="module" src="i18n.js"></script>
 
   <div class="owner-bar">
     <div class="owner-bar-inner">
       <div class="owner-bar-links">
-        <a href="dashboard.html">অর্ডার</a>
-        <a href="admin.html" class="active">বই পরিচালনা</a>
-        <a href="admin-decor.html">ডেকর পরিচালনা</a>
+        <a href="dashboard.html" data-i18n="owner_orders">অর্ডার</a>
+        <a href="admin.html" class="active" data-i18n="owner_manage_books">বই পরিচালনা</a>
+        <a href="admin-decor.html" data-i18n="owner_manage_decor">ডেকর পরিচালনা</a>
       </div>
-      <button class="owner-logout" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> লগআউট</button>
+      <button class="owner-logout" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="owner_logout">লগআউট</span></button>
     </div>
   </div>
 
   <div class="container">
-    <h1 style="margin-top: 24px;">বই পরিচালনা</h1>
+    <h1 style="margin-top: 24px;" data-i18n="admin_books_title">বই পরিচালনা</h1>
 
     <div class="admin-grid">
       <div class="card">
-        <h2 id="form-title">নতুন বই যোগ করুন</h2>
+        <h2 id="form-title" data-i18n="admin_add_new_book">নতুন বই যোগ করুন</h2>
         <form id="book-form">
           <div class="form-group">
-            <label class="form-label" for="f-title">শিরোনাম *</label>
+            <label class="form-label" for="f-title" data-i18n="admin_title_label">শিরোনাম *</label>
             <input class="form-input" id="f-title" required>
           </div>
           <div class="form-group">
-            <label class="form-label" for="f-author">লেখক *</label>
+            <label class="form-label" for="f-author" data-i18n="admin_author_label">লেখক *</label>
             <input class="form-input" id="f-author" required>
           </div>
           <div class="form-row-2">
             <div class="form-group">
-              <label class="form-label" for="f-pages">পৃষ্ঠা *</label>
+              <label class="form-label" for="f-pages" data-i18n="admin_pages_label">পৃষ্ঠা *</label>
               <input class="form-input" type="number" id="f-pages" min="1" required>
             </div>
             <div class="form-group">
-              <label class="form-label" for="f-genre">জনরা *</label>
+              <label class="form-label" for="f-genre" data-i18n="admin_genre_label">জনরা *</label>
               <input class="form-input" id="f-genre" placeholder="যেমন: বিজ্ঞান" required>
             </div>
           </div>
           <div class="form-row-2">
             <div class="form-group">
-              <label class="form-label" for="f-current-price">বর্তমান মূল্য *</label>
+              <label class="form-label" for="f-current-price" data-i18n="admin_current_price">বর্তমান মূল্য *</label>
               <input class="form-input" type="number" id="f-current-price" min="0" required>
             </div>
             <div class="form-group">
-              <label class="form-label" for="f-regular-price">নিয়মিত মূল্য</label>
+              <label class="form-label" for="f-regular-price" data-i18n="admin_regular_price">নিয়মিত মূল্য</label>
               <input class="form-input" type="number" id="f-regular-price" min="0">
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label" for="f-cover">কভার ছবির URL *</label>
+            <label class="form-label" for="f-cover" data-i18n="admin_cover_url">কভার ছবির URL *</label>
             <input class="form-input" type="url" id="f-cover" required>
           </div>
           <div class="form-group">
-            <label class="form-label" for="f-description">বিবরণ</label>
+            <label class="form-label" for="f-description" data-i18n="description_label">বিবরণ</label>
             <textarea class="form-textarea" id="f-description"></textarea>
           </div>
           <div class="form-group">
-            <label class="form-label" for="f-publisher">প্রকাশনী</label>
+            <label class="form-label" for="f-publisher" data-i18n="publisher_label">প্রকাশনী</label>
             <input class="form-input" id="f-publisher">
           </div>
           <div class="form-group">
-            <label class="form-label" for="f-edition">সংস্করণ</label>
+            <label class="form-label" for="f-edition" data-i18n="edition_label">সংস্করণ</label>
             <input class="form-input" id="f-edition">
           </div>
           <div class="form-row-2">
             <div class="form-group">
-              <label class="form-label" for="f-binding">বাঁধাই</label>
+              <label class="form-label" for="f-binding" data-i18n="binding_label">বাঁধাই</label>
               <select class="form-select" id="f-binding">
-                <option value="">— নির্বাচন করুন —</option>
+                <option value="" data-i18n="admin_select">— নির্বাচন করুন —</option>
                 <option value="Paperback">Paperback</option>
                 <option value="Hardcover">Hardcover</option>
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label" for="f-paper">কাগজ</label>
+              <label class="form-label" for="f-paper" data-i18n="paper_label">কাগজ</label>
               <select class="form-select" id="f-paper">
-                <option value="">— নির্বাচন করুন —</option>
+                <option value="" data-i18n="admin_select">— নির্বাচন করুন —</option>
                 <option value="White print">White print</option>
                 <option value="Newsprint">Newsprint</option>
               </select>
@@ -92,7 +93,7 @@
           <div class="form-group">
             <label class="form-label">
               <input type="checkbox" id="f-instock" checked style="width:auto; margin-right:6px;">
-              স্টকে আছে
+              <span data-i18n="admin_in_stock">স্টকে আছে</span>
             </label>
           </div>
 
@@ -100,17 +101,17 @@
 
           <div style="display:flex; gap:10px;">
             <button type="submit" class="btn btn-primary" id="submit-btn">
-              <i class="fa-solid fa-plus"></i> যোগ করুন
+              <i class="fa-solid fa-plus"></i> <span data-i18n="admin_add_book_btn">যোগ করুন</span>
             </button>
-            <button type="button" class="btn btn-outline" id="cancel-edit-btn" style="display:none;">বাতিল</button>
+            <button type="button" class="btn btn-outline" id="cancel-edit-btn" style="display:none;" data-i18n="admin_cancel">বাতিল</button>
           </div>
         </form>
       </div>
 
       <div class="card">
-        <h2>বর্তমান বইসমূহ</h2>
+        <h2 data-i18n="admin_current_books">বর্তমান বইসমূহ</h2>
         <div id="books-list">
-          <p class="loading-state">লোড হচ্ছে…</p>
+          <p class="loading-state" data-i18n="loading">লোড হচ্ছে…</p>
         </div>
       </div>
     </div>
@@ -121,6 +122,7 @@
   <script type="module">
     import { requireAuth, logoutUser } from './auth.js';
     import { fetchBooksLive, addBook, updateBook, deleteBook } from './admin.js';
+    import { t } from './i18n.js';
 
     await requireAuth();
 
@@ -158,8 +160,8 @@
       form.reset();
       fields.inStock.checked = true;
       editingId = null;
-      formTitle.textContent = 'নতুন বই যোগ করুন';
-      submitBtn.innerHTML = '<i class="fa-solid fa-plus"></i> যোগ করুন';
+      formTitle.textContent = t('admin_add_new_book');
+      submitBtn.innerHTML = `<i class="fa-solid fa-plus"></i> ${t('admin_add_book_btn')}`;
       cancelBtn.style.display = 'none';
     }
 
@@ -179,8 +181,8 @@
       fields.inStock.checked = book.inStock !== false;
 
       editingId = book.id;
-      formTitle.textContent = 'বই সম্পাদনা করুন';
-      submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> আপডেট করুন';
+      formTitle.textContent = t('admin_edit_book');
+      submitBtn.innerHTML = `<i class="fa-solid fa-check"></i> ${t('admin_update_btn')}`;
       cancelBtn.style.display = 'inline-flex';
       form.scrollIntoView({ behavior: 'smooth' });
     }
@@ -218,7 +220,7 @@
           listEl.innerHTML = `
             <div class="empty-state">
               <i class="fa-solid fa-book"></i>
-              <p>এখনো কোনো বই যোগ করা হয়নি।</p>
+              <p>${t('admin_no_books_yet')}</p>
             </div>
           `;
           return;
@@ -228,10 +230,10 @@
             <img class="admin-book-thumb" src="${book.coverImage}" alt="${book.title}">
             <div class="admin-book-info">
               <p class="title">${book.title}</p>
-              <p class="meta">${book.author} · ৳${book.currentPrice} · ${book.genre}${book.inStock === false ? ' · স্টকে নেই' : ''}</p>
+              <p class="meta">${book.author} · ৳${book.currentPrice} · ${book.genre}${book.inStock === false ? ` · ${t('out_of_stock')}` : ''}</p>
             </div>
-            <button class="icon-btn edit-btn" data-id="${book.id}" aria-label="সম্পাদনা"><i class="fa-solid fa-pen"></i></button>
-            <button class="icon-btn danger delete-btn" data-id="${book.id}" aria-label="মুছুন"><i class="fa-solid fa-trash"></i></button>
+            <button class="icon-btn edit-btn" data-id="${book.id}" aria-label="${t('admin_edit')}"><i class="fa-solid fa-pen"></i></button>
+            <button class="icon-btn danger delete-btn" data-id="${book.id}" aria-label="${t('admin_delete')}"><i class="fa-solid fa-trash"></i></button>
           </div>
         `).join('');
 
@@ -243,14 +245,14 @@
         });
         listEl.querySelectorAll('.delete-btn').forEach((btn) => {
           btn.addEventListener('click', async () => {
-            if (!confirm('এই বইটি মুছে ফেলতে চান?')) return;
+            if (!confirm(t('admin_confirm_delete_book'))) return;
             await deleteBook(btn.dataset.id);
             loadBooks();
           });
         });
       } catch (err) {
         console.error(err);
-        listEl.innerHTML = `<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><p>বই লোড করা যায়নি। Firebase কনফিগারেশন যাচাই করুন।</p></div>`;
+        listEl.innerHTML = `<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><p>${t('admin_books_load_error')}</p></div>`;
       }
     }
 
@@ -270,7 +272,7 @@
         loadBooks();
       } catch (err) {
         console.error(err);
-        formError.textContent = 'সংরক্ষণ করা যায়নি। আবার চেষ্টা করুন।';
+        formError.textContent = t('admin_save_error');
         formError.style.display = 'block';
       } finally {
         submitBtn.disabled = false;
@@ -282,5 +284,6 @@
     loadBooks();
   </script>
   <script type="module" src="footer.js"></script>
+  <script type="module" src="whatsapp-float.js"></script>
 </body>
 </html>

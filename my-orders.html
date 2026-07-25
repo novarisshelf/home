@@ -8,13 +8,14 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
+  <script type="module" src="i18n.js"></script>
 
   <nav class="navbar">
     <div class="navbar-inner">
       <a href="index.html" class="navbar-brand">Novaris</a>
       <div class="navbar-links">
         <span id="customer-nav-slot" class="navbar-account"></span>
-        <a href="cart.html" class="navbar-cart" aria-label="কার্ট">
+        <a href="cart.html" class="navbar-cart" data-i18n-aria="nav_cart" aria-label="কার্ট">
           <i class="fa-solid fa-cart-shopping"></i>
           <span class="cart-badge">0</span>
         </a>
@@ -23,9 +24,9 @@
   </nav>
 
   <div class="container">
-    <h1 style="margin-top: 24px;">আমার অর্ডার</h1>
+    <h1 style="margin-top: 24px;" data-i18n="orders_title">আমার অর্ডার</h1>
     <div id="orders-list">
-      <p class="loading-state">অর্ডার লোড হচ্ছে…</p>
+      <p class="loading-state" data-i18n="orders_loading">অর্ডার লোড হচ্ছে…</p>
     </div>
   </div>
 
@@ -42,15 +43,51 @@
       getDocs
     } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
     import { renderCartBadge } from './cart.js';
+    import { t, getLang } from './i18n.js';
 
     const user = await requireCustomerAuth();
 
     const listEl = document.getElementById('orders-list');
-    const statusLabels = { pending: 'পেন্ডিং', completed: 'সম্পন্ন', cancelled: 'বাতিল' };
+    const statusLabels = {
+      pending: t('order_status_pending'),
+      confirmed: t('order_status_confirmed'),
+      on_the_way: t('order_status_on_the_way'),
+      delivered: t('order_status_delivered'),
+      cancelled: t('order_status_cancelled')
+    };
+    const STAGES = ['pending', 'confirmed', 'on_the_way', 'delivered'];
+    const STAGE_LABELS = ['order_step_placed', 'order_step_confirmed', 'order_step_on_the_way', 'order_step_delivered'];
 
     function formatTime(ts) {
       if (!ts || !ts.toDate) return '';
-      return ts.toDate().toLocaleString('bn-BD', { dateStyle: 'medium', timeStyle: 'short' });
+      return ts.toDate().toLocaleString(getLang() === 'bn' ? 'bn-BD' : 'en-US', { dateStyle: 'medium', timeStyle: 'short' });
+    }
+
+    function stepperHtml(status) {
+      if (status === 'cancelled') {
+        return `<span class="order-cancelled-badge"><i class="fa-solid fa-circle-xmark"></i> ${t('order_cancelled_note')}</span>`;
+      }
+      const currentIndex = Math.max(STAGES.indexOf(status), 0);
+      return `
+        <div class="order-stepper">
+          ${STAGES.map((stage, i) => {
+            const done = i <= currentIndex;
+            const dot = done
+              ? '<i class="fa-solid fa-check"></i>'
+              : `${i + 1}`;
+            const line = i < STAGES.length - 1
+              ? `<div class="order-step-line ${i < currentIndex ? 'done' : ''}"></div>`
+              : '';
+            return `
+              <div class="order-step ${done ? 'done' : ''}">
+                <div class="order-step-dot">${dot}</div>
+                <div class="order-step-label">${t(STAGE_LABELS[i])}</div>
+              </div>
+              ${line}
+            `;
+          }).join('')}
+        </div>
+      `;
     }
 
     try {
@@ -66,8 +103,8 @@
         listEl.innerHTML = `
           <div class="empty-state">
             <i class="fa-solid fa-receipt"></i>
-            <p>আপনার এখনো কোনো অর্ডার নেই।</p>
-            <a href="index.html" class="btn btn-outline" style="margin-top: 10px;">কেনাকাটা করুন</a>
+            <p>${t('orders_empty')}</p>
+            <a href="index.html" class="btn btn-outline" style="margin-top: 10px;">${t('cart_browse_start')}</a>
           </div>
         `;
       } else {
@@ -76,6 +113,7 @@
           const itemsText = (order.items || [])
             .map((i) => `${i.title} × ${i.qty}`)
             .join(', ');
+          const showTracking = order.trackingLink && status !== 'pending' && status !== 'cancelled';
           return `
             <div class="card order-card">
               <div class="order-card-head">
@@ -86,19 +124,26 @@
               </div>
               <p class="order-items-list">${itemsText}</p>
               <p>${order.address || ''}</p>
-              <p class="order-total">মোট: ৳${order.totalPrice || 0}</p>
+              <p class="order-total">${t('orders_total')}: ৳${order.totalPrice || 0}</p>
+              ${stepperHtml(status)}
+              ${showTracking ? `
+                <a class="order-tracking-link" href="${order.trackingLink}" target="_blank" rel="noopener">
+                  <i class="fa-solid fa-location-crosshairs"></i> ${t('order_tracking_label')}
+                </a>
+              ` : ''}
             </div>
           `;
         }).join('');
       }
     } catch (err) {
       console.error(err);
-      listEl.innerHTML = `<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><p>অর্ডার লোড করা যায়নি। আবার চেষ্টা করুন।</p></div>`;
+      listEl.innerHTML = `<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><p>${t('error_generic')}</p></div>`;
     }
 
     renderCartBadge();
   </script>
   <script type="module" src="customer-nav.js"></script>
   <script type="module" src="footer.js"></script>
+  <script type="module" src="whatsapp-float.js"></script>
 </body>
 </html>

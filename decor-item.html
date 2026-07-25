@@ -8,13 +8,14 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
+  <script type="module" src="i18n.js"></script>
 
   <nav class="navbar">
     <div class="navbar-inner">
       <a href="index.html" class="navbar-brand">Novaris</a>
       <div class="navbar-links">
         <span id="customer-nav-slot" class="navbar-account"></span>
-        <a href="cart.html" class="navbar-cart" aria-label="কার্ট">
+        <a href="cart.html" class="navbar-cart" data-i18n-aria="nav_cart" aria-label="কার্ট">
           <i class="fa-solid fa-cart-shopping"></i>
           <span class="cart-badge">0</span>
         </a>
@@ -23,10 +24,10 @@
   </nav>
 
   <div class="container">
-    <a href="index.html#home-decor" class="back-link"><i class="fa-solid fa-arrow-left"></i> হোমে ফিরুন</a>
+    <a href="index.html#home-decor" class="back-link" data-i18n="back_home"><i class="fa-solid fa-arrow-left"></i> হোমে ফিরুন</a>
 
     <div id="item-detail">
-      <p class="loading-state">পণ্যটি খোঁজা হচ্ছে…</p>
+      <p class="loading-state" id="item-loading-state">পণ্যটি খোঁজা হচ্ছে…</p>
     </div>
   </div>
 
@@ -36,6 +37,9 @@
   <script type="module">
     import { getDecorItemById } from './decor.js';
     import { addToCart, renderCartBadge } from './cart.js';
+    import { t } from './i18n.js';
+
+    document.getElementById('item-loading-state').textContent = t('item_loading');
 
     const params = new URLSearchParams(window.location.search);
     const itemId = params.get('id');
@@ -47,16 +51,16 @@
       container.innerHTML = `
         <div class="empty-state">
           <i class="fa-solid fa-box-open"></i>
-          <p>দুঃখিত, পণ্যটি খুঁজে পাওয়া যায়নি।</p>
+          <p>${t('item_not_found')}</p>
         </div>
       `;
     } else {
       const hasDiscount = item.regularPrice && item.regularPrice > item.currentPrice;
 
       const optionalFields = [
-        ['ক্যাটাগরি', item.category],
-        ['উপাদান', item.material],
-        ['মাপ', item.dimensions]
+        [t('category_label'), item.category],
+        [t('material_label'), item.material],
+        [t('dimensions_label'), item.dimensions]
       ].filter(([, value]) => value);
 
       container.innerHTML = `
@@ -84,19 +88,19 @@
             <div class="detail-actions">
               ${item.inStock ? `
                 <div class="qty-stepper" id="add-qty-stepper">
-                  <button type="button" class="qty-btn qty-minus" aria-label="কমান" disabled>
+                  <button type="button" class="qty-btn qty-minus" aria-label="${t('cart_qty_decrease')}" disabled>
                     <i class="fa-solid fa-minus"></i>
                   </button>
                   <span class="qty-value" id="add-qty-value">1</span>
-                  <button type="button" class="qty-btn qty-plus" aria-label="বাড়ান">
+                  <button type="button" class="qty-btn qty-plus" aria-label="${t('cart_qty_increase')}">
                     <i class="fa-solid fa-plus"></i>
                   </button>
                 </div>
                 <button id="add-to-cart-btn" class="btn btn-primary">
-                  <i class="fa-solid fa-cart-plus"></i> কার্টে যোগ করুন
+                  <i class="fa-solid fa-cart-plus"></i> ${t('add_to_cart')}
                 </button>
               ` : `
-                <span class="stock-msg"><i class="fa-solid fa-ban"></i> স্টকে নেই</span>
+                <span class="stock-msg"><i class="fa-solid fa-ban"></i> ${t('not_in_stock')}</span>
               `}
             </div>
           </div>
@@ -126,7 +130,7 @@
       if (addBtn) {
         addBtn.addEventListener('click', () => {
           addToCart(item, 'decor', addQty);
-          showToast('কার্টে যোগ করা হয়েছে ✓');
+          showToast(t('added_to_cart'));
         });
       }
     }
@@ -142,5 +146,6 @@
   </script>
   <script type="module" src="customer-nav.js"></script>
   <script type="module" src="footer.js"></script>
+  <script type="module" src="whatsapp-float.js"></script>
 </body>
 </html>

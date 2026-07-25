@@ -9,13 +9,14 @@
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
+  <script type="module" src="i18n.js"></script>
 
   <nav class="navbar">
     <div class="navbar-inner">
       <a href="index.html" class="navbar-brand">Novaris</a>
       <div class="navbar-links">
         <span id="customer-nav-slot" class="navbar-account"></span>
-        <a href="cart.html" class="navbar-cart" aria-label="কার্ট">
+        <a href="cart.html" class="navbar-cart" data-i18n-aria="nav_cart" aria-label="কার্ট">
           <i class="fa-solid fa-cart-shopping"></i>
           <span class="cart-badge">0</span>
         </a>
@@ -24,7 +25,7 @@
   </nav>
 
   <div class="container">
-    <h1>আপনার কার্ট</h1>
+    <h1 data-i18n="cart_title">আপনার কার্ট</h1>
 
     <div class="cart-layout" id="cart-layout">
       <div class="card" id="cart-items-card">
@@ -32,36 +33,36 @@
       </div>
 
       <div class="card" id="checkout-card">
-        <h2>চেকআউট</h2>
+        <h2 data-i18n="cart_checkout">চেকআউট</h2>
         <div class="cart-summary-row">
-          <span>সাবটোটাল</span>
+          <span data-i18n="cart_subtotal">সাবটোটাল</span>
           <span id="summary-subtotal">৳0</span>
         </div>
         <div class="cart-summary-row cart-summary-total">
-          <span>মোট</span>
+          <span data-i18n="cart_total">মোট</span>
           <span id="summary-total">৳0</span>
         </div>
 
         <form id="checkout-form" style="margin-top: 18px;">
           <div class="form-group">
-            <label class="form-label" for="cust-name">নাম *</label>
+            <label class="form-label" for="cust-name" data-i18n="checkout_name">নাম *</label>
             <input class="form-input" type="text" id="cust-name" required>
           </div>
           <div class="form-group">
-            <label class="form-label" for="cust-phone">ফোন নম্বর *</label>
+            <label class="form-label" for="cust-phone" data-i18n="checkout_phone">ফোন নম্বর *</label>
             <input class="form-input" type="tel" id="cust-phone" placeholder="01XXXXXXXXX" required>
-            <p class="form-error" id="phone-error" style="display:none;">সঠিক বাংলাদেশি মোবাইল নম্বর দিন</p>
+            <p class="form-error" id="phone-error" style="display:none;" data-i18n="checkout_phone_error">সঠিক বাংলাদেশি মোবাইল নম্বর দিন</p>
           </div>
           <div class="form-group">
-            <label class="form-label" for="cust-address">ঠিকানা *</label>
+            <label class="form-label" for="cust-address" data-i18n="checkout_address">ঠিকানা *</label>
             <textarea class="form-textarea" id="cust-address" required></textarea>
           </div>
           <div class="form-group">
-            <label class="form-label" for="cust-email">ইমেইল (ঐচ্ছিক)</label>
+            <label class="form-label" for="cust-email" data-i18n="checkout_email">ইমেইল (ঐচ্ছিক)</label>
             <input class="form-input" type="email" id="cust-email">
           </div>
           <button type="submit" class="btn btn-primary btn-block" id="place-order-btn">
-            <i class="fa-solid fa-check"></i> অর্ডার করুন
+            <i class="fa-solid fa-check"></i> <span data-i18n="checkout_place_order">অর্ডার করুন</span>
           </button>
           <p class="form-error" id="order-error" style="display:none;"></p>
         </form>
@@ -69,8 +70,8 @@
         <div id="order-confirmation" style="display:none;">
           <div class="empty-state">
             <i class="fa-solid fa-circle-check"></i>
-            <p>ধন্যবাদ! আপনার অর্ডার সফলভাবে সম্পন্ন হয়েছে।</p>
-            <a href="index.html" class="btn btn-outline" style="margin-top: 10px;">কেনাকাটা চালিয়ে যান</a>
+            <p data-i18n="checkout_success_msg2">ধন্যবাদ! আপনার অর্ডার সফলভাবে সম্পন্ন হয়েছে।</p>
+            <a href="index.html" class="btn btn-outline" style="margin-top: 10px;" data-i18n="cart_browse">কেনাকাটা চালিয়ে যান</a>
           </div>
         </div>
       </div>
@@ -83,6 +84,7 @@
     import {
       getCart, removeFromCart, updateCartItemQty, getCartTotal, renderCartBadge
     } from './cart.js';
+    import { t } from './i18n.js';
     // checkout.js pulls in Firebase, so it's loaded lazily on submit — the
     // cart itself (view/edit/remove) never depends on Firebase being reachable.
 
@@ -95,8 +97,8 @@
         itemsCard.innerHTML = `
           <div class="empty-state">
             <i class="fa-solid fa-cart-shopping"></i>
-            <p>আপনার কার্ট খালি।</p>
-            <a href="index.html" class="btn btn-outline" style="margin-top: 10px;">কেনাকাটা করুন</a>
+            <p>${t('cart_empty')}</p>
+            <a href="index.html" class="btn btn-outline" style="margin-top: 10px;">${t('cart_browse_start')}</a>
           </div>
         `;
         checkoutCard.style.display = 'none';
@@ -104,23 +106,23 @@
       }
 
       checkoutCard.style.display = '';
-      itemsCard.innerHTML = `<h2>পণ্যসমূহ (${cart.length})</h2>` + cart.map((item) => `
+      itemsCard.innerHTML = `<h2>${t('cart_items_heading').replace('{n}', cart.length)}</h2>` + cart.map((item) => `
         <div class="cart-item" data-item-id="${item.itemId}" data-item-type="${item.itemType}">
           <div>
             <p class="cart-item-title">${item.title}</p>
             <p class="cart-item-price">৳${item.price} × ${item.qty}</p>
           </div>
           <div class="qty-stepper" data-item-id="${item.itemId}" data-item-type="${item.itemType}">
-            <button type="button" class="qty-btn qty-minus" aria-label="কমান" ${item.qty <= 1 ? 'disabled' : ''}>
+            <button type="button" class="qty-btn qty-minus" aria-label="${t('cart_qty_decrease')}" ${item.qty <= 1 ? 'disabled' : ''}>
               <i class="fa-solid fa-minus"></i>
             </button>
             <span class="qty-value">${item.qty}</span>
-            <button type="button" class="qty-btn qty-plus" aria-label="বাড়ান">
+            <button type="button" class="qty-btn qty-plus" aria-label="${t('cart_qty_increase')}">
               <i class="fa-solid fa-plus"></i>
             </button>
           </div>
           <span class="price-current">৳${item.price * item.qty}</span>
-          <button class="icon-btn danger remove-btn" data-item-id="${item.itemId}" data-item-type="${item.itemType}" aria-label="সরিয়ে ফেলুন">
+          <button class="icon-btn danger remove-btn" data-item-id="${item.itemId}" data-item-type="${item.itemType}" aria-label="${t('cart_remove')}">
             <i class="fa-solid fa-trash"></i>
           </button>
         </div>
@@ -172,7 +174,7 @@
 
       const btn = document.getElementById('place-order-btn');
       btn.disabled = true;
-      btn.textContent = 'পাঠানো হচ্ছে…';
+      btn.textContent = t('checkout_sending');
       orderError.style.display = 'none';
 
       try {
@@ -182,10 +184,10 @@
         document.getElementById('order-confirmation').style.display = 'block';
       } catch (err) {
         console.error(err);
-        orderError.textContent = 'অর্ডার পাঠাতে সমস্যা হয়েছে। আবার চেষ্টা করুন।';
+        orderError.textContent = t('checkout_error');
         orderError.style.display = 'block';
         btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-check"></i> অর্ডার করুন';
+        btn.innerHTML = `<i class="fa-solid fa-check"></i> ${t('checkout_place_order')}`;
       }
     });
 
@@ -194,5 +196,6 @@
   </script>
   <script type="module" src="customer-nav.js"></script>
   <script type="module" src="footer.js"></script>
+  <script type="module" src="whatsapp-float.js"></script>
 </body>
 </html>
