@@ -176,7 +176,7 @@
       orderError.style.display = 'none';
 
       try {
-        const { submitOrder } = await import('./js/checkout.js');
+        const { submitOrder } = await import('./checkout.js');
         await submitOrder({ name, phone, address, email });
         document.getElementById('checkout-form').style.display = 'none';
         document.getElementById('order-confirmation').style.display = 'block';
