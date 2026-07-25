@@ -25,20 +25,26 @@ if (typeof emailjs !== 'undefined') {
 }
 
 /**
- * customer: { name, phone, address, email }
+ * customer: { name, phone, address, email, deliveryLocation: 'inside' | 'outside' }
  * Throws Error('EMPTY_CART') if there's nothing to order.
  */
 export async function submitOrder(customer) {
   const items = getCart();
   if (items.length === 0) throw new Error('EMPTY_CART');
 
-  const totalPrice = getCartTotal();
+  const subtotal = getCartTotal();
+  const deliveryLocation = customer.deliveryLocation === 'outside' ? 'outside' : 'inside';
+  const deliveryCharge = deliveryLocation === 'outside' ? 120 : 0;
+  const totalPrice = subtotal + deliveryCharge;
   const orderData = {
     customerName: customer.name,
     phone: customer.phone,
     address: customer.address,
     email: customer.email || '',
     items,
+    subtotal,
+    deliveryLocation,
+    deliveryCharge,
     totalPrice,
     createdAt: serverTimestamp(),
     status: 'pending',
@@ -52,6 +58,9 @@ export async function submitOrder(customer) {
   const itemsSummary = items
     .map((i) => `${i.title} × ${i.qty} — ৳${i.price * i.qty}`)
     .join('\n');
+  const deliveryLabel = deliveryLocation === 'outside'
+    ? `ঢাকার বাইরে (+৳${deliveryCharge})`
+    : 'ঢাকার ভেতরে (ফ্রি)';
 
   if (typeof emailjs !== 'undefined') {
     try {
@@ -62,6 +71,7 @@ export async function submitOrder(customer) {
         customer_address: customer.address,
         customer_email: customer.email || 'দেওয়া হয়নি',
         order_items: itemsSummary,
+        delivery_area: deliveryLabel,
         order_total: `৳${totalPrice}`
       });
     } catch (err) {

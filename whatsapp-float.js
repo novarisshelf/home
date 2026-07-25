@@ -3,8 +3,10 @@
 //
 // - Click (without dragging) opens a WhatsApp chat to the shop's number.
 // - Drag to reposition anywhere on screen.
-// - Drag it off the edge of the screen to dismiss it — it comes back on its
-//   own after 5 minutes, or immediately on the next page load/reload
+// - While dragging, a "remove" cross target appears at the bottom-center of
+//   the screen (like dragging an app icon to uninstall on a phone home
+//   screen). Drop the button on that target to dismiss it — it comes back
+//   on its own after 5 minutes, or immediately on the next page load/reload
 //   (this state is intentionally NOT persisted anywhere, so a reload
 //   always shows it fresh).
 
@@ -25,6 +27,11 @@ function init() {
   `;
   document.body.appendChild(wrap);
 
+  const removeZone = document.createElement('div');
+  removeZone.className = 'wa-remove-zone';
+  removeZone.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+  document.body.appendChild(removeZone);
+
   let startX = 0;
   let startY = 0;
   let originLeft = 0;
@@ -41,6 +48,13 @@ function init() {
     wrap.style.display = 'none';
     clearTimeout(hideTimer);
     hideTimer = setTimeout(show, HIDE_DURATION_MS);
+  }
+
+  function overlapsRemoveZone(rect) {
+    const zone = removeZone.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    return cx >= zone.left && cx <= zone.right && cy >= zone.top && cy <= zone.bottom;
   }
 
   function onPointerDown(e) {
@@ -68,15 +82,24 @@ function init() {
     if (!dragging) return;
     const dx = e.clientX - startX;
     const dy = e.clientY - startY;
-    if (Math.abs(dx) > DRAG_THRESHOLD_PX || Math.abs(dy) > DRAG_THRESHOLD_PX) moved = true;
+    if (Math.abs(dx) > DRAG_THRESHOLD_PX || Math.abs(dy) > DRAG_THRESHOLD_PX) {
+      if (!moved) removeZone.classList.add('visible'); // reveal the cross target once a real drag starts
+      moved = true;
+    }
     wrap.style.left = `${originLeft + dx}px`;
     wrap.style.top = `${originTop + dy}px`;
+
+    if (moved) {
+      const rect = wrap.getBoundingClientRect();
+      removeZone.classList.toggle('armed', overlapsRemoveZone(rect));
+    }
   }
 
   function onPointerUp() {
     if (!dragging) return;
     dragging = false;
     wrap.classList.remove('dragging');
+    removeZone.classList.remove('visible', 'armed');
 
     if (!moved) {
       window.open(`https://wa.me/${WHATSAPP_NUMBER}`, '_blank', 'noopener');
@@ -84,13 +107,8 @@ function init() {
     }
 
     const rect = wrap.getBoundingClientRect();
-    const offScreen =
-      rect.left < -10 ||
-      rect.top < -10 ||
-      rect.right > window.innerWidth + 10 ||
-      rect.bottom > window.innerHeight + 10;
 
-    if (offScreen) {
+    if (overlapsRemoveZone(rect)) {
       hideFor5Min();
       return;
     }

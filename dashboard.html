@@ -133,6 +133,7 @@
             </div>
             <p class="order-items-list">${itemsText}</p>
             <p>${order.address || ''}</p>
+            ${order.deliveryLocation ? `<p class="order-delivery-note">${order.deliveryLocation === 'outside' ? t('order_delivery_outside') : t('order_delivery_inside')}</p>` : ''}
             <p class="order-total">${t('orders_total')}: ৳${order.totalPrice || 0}</p>
             ${status !== 'cancelled' ? `
               <div class="order-tracking-row">

@@ -38,6 +38,10 @@
           <span data-i18n="cart_subtotal">সাবটোটাল</span>
           <span id="summary-subtotal">৳0</span>
         </div>
+        <div class="cart-summary-row" id="summary-delivery-row" style="display:none;">
+          <span data-i18n="cart_delivery_charge">ডেলিভারি চার্জ</span>
+          <span id="summary-delivery">৳0</span>
+        </div>
         <div class="cart-summary-row cart-summary-total">
           <span data-i18n="cart_total">মোট</span>
           <span id="summary-total">৳0</span>
@@ -60,6 +64,19 @@
           <div class="form-group">
             <label class="form-label" for="cust-email" data-i18n="checkout_email">ইমেইল (ঐচ্ছিক)</label>
             <input class="form-input" type="email" id="cust-email">
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="checkout_delivery_location">ডেলিভারি এলাকা *</label>
+            <div class="delivery-options" id="delivery-options">
+              <label class="delivery-option">
+                <input type="radio" name="delivery-location" value="inside" required>
+                <span data-i18n="checkout_delivery_inside">ঢাকার ভেতরে (ফ্রি)</span>
+              </label>
+              <label class="delivery-option">
+                <input type="radio" name="delivery-location" value="outside" required>
+                <span data-i18n="checkout_delivery_outside">ঢাকার বাইরে (+৳১২০)</span>
+              </label>
+            </div>
           </div>
           <button type="submit" class="btn btn-primary btn-block" id="place-order-btn">
             <i class="fa-solid fa-check"></i> <span data-i18n="checkout_place_order">অর্ডার করুন</span>
@@ -87,6 +104,41 @@
     import { t } from './i18n.js';
     // checkout.js pulls in Firebase, so it's loaded lazily on submit — the
     // cart itself (view/edit/remove) never depends on Firebase being reachable.
+
+    function getSelectedDeliveryLocation() {
+      const checked = document.querySelector('input[name="delivery-location"]:checked');
+      return checked ? checked.value : null;
+    }
+
+    function deliveryChargeFor(location) {
+      return location === 'outside' ? 120 : 0;
+    }
+
+    function updateSummary() {
+      const subtotal = getCartTotal();
+      const location = getSelectedDeliveryLocation();
+      const deliveryRow = document.getElementById('summary-delivery-row');
+
+      document.getElementById('summary-subtotal').textContent = `৳${subtotal}`;
+
+      if (location === null) {
+        deliveryRow.style.display = 'none';
+        document.getElementById('summary-total').textContent = `৳${subtotal}`;
+      } else {
+        const charge = deliveryChargeFor(location);
+        deliveryRow.style.display = '';
+        document.getElementById('summary-delivery').textContent = `৳${charge}`;
+        document.getElementById('summary-total').textContent = `৳${subtotal + charge}`;
+      }
+    }
+
+    document.querySelectorAll('input[name="delivery-location"]').forEach((radio) => {
+      radio.addEventListener('change', () => {
+        document.querySelectorAll('.delivery-option').forEach((label) => label.classList.remove('selected'));
+        radio.closest('.delivery-option').classList.add('selected');
+        updateSummary();
+      });
+    });
 
     function renderCart() {
       const cart = getCart();
@@ -153,9 +205,7 @@
         });
       });
 
-      const total = getCartTotal();
-      document.getElementById('summary-subtotal').textContent = `৳${total}`;
-      document.getElementById('summary-total').textContent = `৳${total}`;
+      updateSummary();
     }
 
     document.getElementById('checkout-form').addEventListener('submit', async (e) => {
@@ -165,12 +215,17 @@
       const phone = document.getElementById('cust-phone').value.trim();
       const address = document.getElementById('cust-address').value.trim();
       const email = document.getElementById('cust-email').value.trim();
+      const deliveryLocation = getSelectedDeliveryLocation();
       const phoneError = document.getElementById('phone-error');
       const orderError = document.getElementById('order-error');
 
       const validPhone = /^01[3-9]\d{8}$/.test(phone);
       phoneError.style.display = validPhone ? 'none' : 'block';
       if (!validPhone) return;
+
+      // Belt-and-braces: the radios are already `required`, so the browser
+      // won't let the form submit without one selected, but guard anyway.
+      if (!deliveryLocation) return;
 
       const btn = document.getElementById('place-order-btn');
       btn.disabled = true;
@@ -179,7 +234,7 @@
 
       try {
         const { submitOrder } = await import('./checkout.js');
-        await submitOrder({ name, phone, address, email });
+        await submitOrder({ name, phone, address, email, deliveryLocation });
         document.getElementById('checkout-form').style.display = 'none';
         document.getElementById('order-confirmation').style.display = 'block';
       } catch (err) {

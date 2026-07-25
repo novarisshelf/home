@@ -76,7 +76,7 @@
               ? '<i class="fa-solid fa-check"></i>'
               : `${i + 1}`;
             const line = i < STAGES.length - 1
-              ? `<div class="order-step-line ${i < currentIndex ? 'done' : ''}"></div>`
+              ? `<div class="order-step-line ${i < currentIndex ? 'done' : ''}"><i class="fa-solid fa-chevron-right"></i></div>`
               : '';
             return `
               <div class="order-step ${done ? 'done' : ''}">
@@ -124,6 +124,7 @@
               </div>
               <p class="order-items-list">${itemsText}</p>
               <p>${order.address || ''}</p>
+              ${order.deliveryLocation ? `<p class="order-delivery-note">${order.deliveryLocation === 'outside' ? t('order_delivery_outside') : t('order_delivery_inside')}</p>` : ''}
               <p class="order-total">${t('orders_total')}: ৳${order.totalPrice || 0}</p>
               ${stepperHtml(status)}
               ${showTracking ? `
