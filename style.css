@@ -76,35 +76,6 @@ html[data-theme="dark"] .status-on_the_way { background: #3D2D1A; color: #E8A75C
 html[data-theme="dark"] .status-delivered { background: #1C3324; color: #6FCF97; }
 html[data-theme="dark"] .status-cancelled, html[data-theme="dark"] .order-cancelled-badge { background: #3A2323; color: #F28B82; }
 
-/* Toggle button itself — same "circle on the navbar" treatment as .navbar-cart,
-   so it fits right in wherever theme.js mounts it (customer navbar, owner
-   bar, or the plain login navbar). */
-.theme-toggle-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(255, 253, 249, 0.12);
-  color: var(--color-white);
-  font-size: 0.85rem;
-  transition: background var(--transition);
-}
-.theme-toggle-btn:hover { background: rgba(255, 253, 249, 0.22); }
-/* Defensive fallback only — every current page has a navbar/owner-bar for
-   theme.js to mount into, so this shouldn't normally be needed. */
-.theme-toggle-floating {
-  position: fixed;
-  top: 14px;
-  right: 14px;
-  z-index: 60;
-  background: var(--color-surface);
-  color: var(--color-primary);
-  box-shadow: var(--shadow-md);
-}
-
 /* ---------- Reset ---------- */
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -952,6 +923,8 @@ h3 { font-size: 1.15rem; }
   transition: background var(--transition);
 }
 .settings-option:hover { background: var(--color-bg-shelf); }
+.settings-option:disabled { opacity: 0.6; cursor: default; }
+.settings-option:disabled:hover { background: none; }
 .settings-check { font-size: 0.78rem; color: var(--color-primary); opacity: 0; }
 .settings-check.active { opacity: 1; }
 .settings-divider { height: 1px; background: var(--color-border); margin: 6px 4px; }
@@ -966,6 +939,36 @@ h3 { font-size: 1.15rem; }
   padding: 2px 8px;
   border-radius: 999px;
 }
+.settings-hint {
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--color-text-muted);
+  padding: 6px 10px 2px;
+  max-width: 210px;
+}
+.settings-switch {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--color-border);
+  flex-shrink: 0;
+  transition: background var(--transition);
+}
+.settings-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-white);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition);
+}
+.settings-switch.on { background: var(--color-primary); }
+.settings-switch.on::after { transform: translateX(16px); }
 
 /* ---------- Customer account dashboard (my-account.html) ---------- */
 .account-wrap {
@@ -1113,6 +1116,13 @@ h3 { font-size: 1.15rem; }
 }
 .owner-bar-links a.active { opacity: 1; border-bottom: 2px solid var(--color-accent); padding-bottom: 3px; }
 .owner-bar-links a:hover { opacity: 1; }
+.owner-bar-actions { display: flex; align-items: center; gap: 10px; }
+.owner-bar-actions .settings-trigger {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: var(--color-white);
+}
+.owner-bar-actions .settings-trigger:hover { background: rgba(255, 255, 255, 0.12); }
 .owner-logout {
   background: none;
   border: 1px solid rgba(255,255,255,0.4);

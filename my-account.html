@@ -3,7 +3,8 @@
 <head>
   <script>
     try {
-      if (localStorage.getItem('novaris_theme') === 'dark') {
+      var novarisThemeRaw = localStorage.getItem('novaris_cache_theme');
+      if (novarisThemeRaw && JSON.parse(novarisThemeRaw).data === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
       }
     } catch (e) {}
@@ -47,11 +48,6 @@
             <span data-i18n="settings_lang_en">English</span>
             <i class="fa-solid fa-check settings-check" id="check-en"></i>
           </button>
-          <div class="settings-divider"></div>
-          <div class="settings-option settings-option-disabled">
-            <span data-i18n="settings_theme">থিম</span>
-            <span class="settings-soon" data-i18n="settings_theme_soon">শীঘ্রই আসছে</span>
-          </div>
         </div>
       </div>
     </div>

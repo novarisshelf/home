@@ -80,3 +80,10 @@ export function clearCache(key) {
   memoryCache.delete(key);
   try { localStorage.removeItem(key); } catch {}
 }
+
+/** Directly stores a known-fresh value (e.g. right after writing it to Firestore
+ *  yourself), so the writer sees it instantly instead of waiting on the TTL. */
+export function setCache(key, data) {
+  memoryCache.set(key, data);
+  writeToStorage(key, data);
+}

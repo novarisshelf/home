@@ -1,104 +1,75 @@
 // theme.js
-// Manual light/dark theme toggle, shared across every page.
+// Site-wide light/dark theme — the SAME theme for every visitor, sourced
+// from a single Firestore doc (settings/site) that only the owner can write
+// (see the "settings" rule in firestore.rules). There is no per-visitor
+// toggle; regular pages just read and apply whatever the owner has set.
+// The owner changes it from the ⋮ menu on dashboard.html, which calls
+// setSiteTheme() below.
 //
-// Light is always the default for a new visitor — this does NOT auto-follow
-// the device/browser's system dark-mode setting. If someone has explicitly
-// switched to dark before, that choice is remembered (localStorage) and
-// restored on their next visit.
+// Loaded on every page (like i18n.js/footer.js), so importing this module
+// is enough to have the current site theme applied automatically.
 //
-// Flash-of-wrong-theme note: applying the saved theme here (after the DOM
-// is ready) would show a flash of light for a split second on every page
-// for a visitor who'd chosen dark. To avoid that, each page also has a tiny
-// inline snippet at the very top of <head> (before anything renders) that
-// re-applies the saved theme immediately:
+// Flash-of-wrong-theme note: since the real value lives in Firestore, a
+// pure network fetch on every page would show a flash of the light default
+// while it loads. To avoid that, the last-known value is cached in
+// localStorage (via data-cache.js) and re-applied synchronously by a tiny
+// inline snippet at the very top of each page's <head> — before anything
+// renders:
 //
 //   <script>
 //     try {
-//       if (localStorage.getItem('novaris_theme') === 'dark') {
+//       var raw = localStorage.getItem('novaris_cache_theme');
+//       if (raw && JSON.parse(raw).data === 'dark') {
 //         document.documentElement.setAttribute('data-theme', 'dark');
 //       }
 //     } catch (e) {}
 //   </script>
 //
-// This module only needs to handle the toggle *button* — building it,
-// mounting it in the right spot, and wiring up clicks.
+// This module then reconciles with the live Firestore value in the
+// background (stale-while-revalidate) and corrects the page if the owner
+// changed it since the last cache.
 
-const THEME_KEY = 'novaris_theme';
+import { db } from './firebase-config.js';
+import { cachedFetch, setCache } from './data-cache.js';
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-function getSavedTheme() {
-  try {
-    return localStorage.getItem(THEME_KEY); // 'dark' | 'light' | null
-  } catch {
-    return null;
-  }
-}
+const THEME_CACHE_KEY = 'novaris_cache_theme';
+const THEME_TTL_MS = 2 * 60 * 1000; // 2 minutes — owner's change should reach visitors reasonably fast
 
-function isDarkActive() {
-  return document.documentElement.getAttribute('data-theme') === 'dark';
-}
-
-function updateButtonIcon(button, dark) {
-  const icon = button.querySelector('i');
-  icon.className = dark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-  button.setAttribute('aria-label', dark ? 'লাইট থিম চালু করুন' : 'ডার্ক থিম চালু করুন');
-  button.title = dark ? 'Light theme' : 'Dark theme';
-}
-
-function setTheme(button, dark) {
-  if (dark) {
+function applyTheme(theme) {
+  if (theme === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
   } else {
     document.documentElement.removeAttribute('data-theme');
   }
-  try { localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light'); } catch {}
-  updateButtonIcon(button, dark);
 }
 
-/** Places the toggle wherever this page's header layout has room for it. */
-function mount(button) {
-  const navbarLinks = document.querySelector('.navbar-links');
-  if (navbarLinks) {
-    navbarLinks.prepend(button);
-    return;
+async function fetchSiteThemeFromFirestore() {
+  const snap = await getDoc(doc(db, 'settings', 'site'));
+  return snap.exists() && snap.data().theme === 'dark' ? 'dark' : 'light';
+}
+
+/** Current site-wide theme ('light' | 'dark'), cached for instant repeat reads. */
+export async function getSiteTheme() {
+  try {
+    return await cachedFetch(THEME_CACHE_KEY, fetchSiteThemeFromFirestore, THEME_TTL_MS);
+  } catch {
+    return 'light'; // settings doc doesn't exist yet, or offline — light is the safe default
   }
-
-  const ownerBarInner = document.querySelector('.owner-bar-inner');
-  if (ownerBarInner) {
-    const logoutBtn = document.getElementById('logout-btn');
-    ownerBarInner.insertBefore(button, logoutBtn || null);
-    return;
-  }
-
-  const navbarInner = document.querySelector('.navbar-inner');
-  if (navbarInner) {
-    navbarInner.appendChild(button);
-    return;
-  }
-
-  // Defensive fallback for any page without a recognizable header.
-  button.classList.add('theme-toggle-floating');
-  document.body.appendChild(button);
 }
 
-function init() {
-  if (document.querySelector('.theme-toggle-btn')) return; // don't double-inject
-
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = 'theme-toggle-btn';
-  button.innerHTML = '<i class="fa-solid fa-moon"></i>';
-
-  updateButtonIcon(button, isDarkActive());
-
-  button.addEventListener('click', () => {
-    setTheme(button, !isDarkActive());
-  });
-
-  mount(button);
+/**
+ * Owner-only: changes the theme for the WHOLE site. Writes to Firestore
+ * (firestore.rules restricts this to the owner's account), applies it to
+ * the current page immediately, and updates the local cache so the owner
+ * doesn't wait out the TTL to see it reflected on their own next page.
+ */
+export async function setSiteTheme(theme) {
+  const normalized = theme === 'dark' ? 'dark' : 'light';
+  await setDoc(doc(db, 'settings', 'site'), { theme: normalized }, { merge: true });
+  applyTheme(normalized);
+  setCache(THEME_CACHE_KEY, normalized);
+  return normalized;
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
+applyTheme(await getSiteTheme());

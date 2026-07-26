@@ -3,7 +3,8 @@
 <head>
   <script>
     try {
-      if (localStorage.getItem('novaris_theme') === 'dark') {
+      var novarisThemeRaw = localStorage.getItem('novaris_cache_theme');
+      if (novarisThemeRaw && JSON.parse(novarisThemeRaw).data === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
       }
     } catch (e) {}
@@ -24,7 +25,22 @@
         <a href="admin.html" data-i18n="owner_manage_books">বই পরিচালনা</a>
         <a href="admin-decor.html" data-i18n="owner_manage_decor">ডেকর পরিচালনা</a>
       </div>
-      <button class="owner-logout" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="owner_logout">লগআউট</span></button>
+      <div class="owner-bar-actions">
+        <div class="settings-menu-wrap">
+          <button type="button" class="settings-trigger" id="settings-trigger" data-i18n-aria="settings_menu_label" aria-label="সেটিংস" aria-haspopup="true" aria-expanded="false">
+            <i class="fa-solid fa-ellipsis-vertical"></i>
+          </button>
+          <div class="settings-dropdown" id="settings-dropdown" hidden>
+            <div class="settings-group-label" data-i18n="settings_theme">থিম</div>
+            <button type="button" class="settings-option" id="theme-toggle-option">
+              <span data-i18n="settings_dark_theme">ডার্ক থিম</span>
+              <span class="settings-switch" id="theme-switch" aria-hidden="true"></span>
+            </button>
+            <p class="settings-hint" data-i18n="settings_theme_site_wide">এটি পুরো সাইটের জন্য প্রযোজ্য — সব ভিজিটর এই থিম দেখবেন।</p>
+          </div>
+        </div>
+        <button class="owner-logout" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="owner_logout">লগআউট</span></button>
+      </div>
     </div>
   </div>
 
@@ -51,12 +67,48 @@
     import { requireAuth, logoutUser } from './auth.js';
     import { fetchOrders, updateOrder } from './dashboard.js';
     import { t, getLang } from './i18n.js';
+    import { getSiteTheme, setSiteTheme } from './theme.js';
 
     await requireAuth();
 
     document.getElementById('logout-btn').addEventListener('click', async () => {
       await logoutUser();
       window.location.href = 'login.html';
+    });
+
+    // ---------- Settings menu (⋮): site-wide theme toggle ----------
+    const settingsTrigger = document.getElementById('settings-trigger');
+    const settingsDropdown = document.getElementById('settings-dropdown');
+    const themeToggleOption = document.getElementById('theme-toggle-option');
+    const themeSwitch = document.getElementById('theme-switch');
+
+    settingsTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const willOpen = settingsDropdown.hidden;
+      settingsDropdown.hidden = !willOpen;
+      settingsTrigger.setAttribute('aria-expanded', String(willOpen));
+    });
+    settingsDropdown.addEventListener('click', (e) => e.stopPropagation());
+    document.addEventListener('click', () => {
+      settingsDropdown.hidden = true;
+      settingsTrigger.setAttribute('aria-expanded', 'false');
+    });
+
+    let currentSiteTheme = await getSiteTheme();
+    themeSwitch.classList.toggle('on', currentSiteTheme === 'dark');
+
+    themeToggleOption.addEventListener('click', async () => {
+      const next = currentSiteTheme === 'dark' ? 'light' : 'dark';
+      themeToggleOption.disabled = true;
+      try {
+        currentSiteTheme = await setSiteTheme(next);
+        themeSwitch.classList.toggle('on', currentSiteTheme === 'dark');
+      } catch (err) {
+        console.error(err);
+        alert(t('owner_theme_update_error'));
+      } finally {
+        themeToggleOption.disabled = false;
+      }
     });
 
     const listEl = document.getElementById('orders-list');

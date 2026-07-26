@@ -25,6 +25,15 @@ service cloud.firestore {
         && request.auth.token.email == "YOUR_OWNER_EMAIL";
     }
 
+    // ---- Site-wide settings (currently just the light/dark theme):
+    // everyone can read it (every visitor's page applies it), only the
+    // owner can change it (from the ⋮ menu on dashboard.html). ----
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null
+        && request.auth.token.email == "YOUR_OWNER_EMAIL";
+    }
+
     // ---- Orders: the owner can read/write everything (dashboard.html).
     // A signed-in customer can create an order for themself and read only
     // their own past orders (my-orders.html). Guest checkout (no login)
