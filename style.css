@@ -939,13 +939,6 @@ h3 { font-size: 1.15rem; }
   padding: 2px 8px;
   border-radius: 999px;
 }
-.settings-hint {
-  font-size: 0.72rem;
-  line-height: 1.4;
-  color: var(--color-text-muted);
-  padding: 6px 10px 2px;
-  max-width: 210px;
-}
 .settings-switch {
   position: relative;
   width: 36px;
@@ -1116,13 +1109,6 @@ h3 { font-size: 1.15rem; }
 }
 .owner-bar-links a.active { opacity: 1; border-bottom: 2px solid var(--color-accent); padding-bottom: 3px; }
 .owner-bar-links a:hover { opacity: 1; }
-.owner-bar-actions { display: flex; align-items: center; gap: 10px; }
-.owner-bar-actions .settings-trigger {
-  background: none;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  color: var(--color-white);
-}
-.owner-bar-actions .settings-trigger:hover { background: rgba(255, 255, 255, 0.12); }
 .owner-logout {
   background: none;
   border: 1px solid rgba(255,255,255,0.4);

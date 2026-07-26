@@ -3,8 +3,7 @@
 <head>
   <script>
     try {
-      var novarisThemeRaw = localStorage.getItem('novaris_cache_theme');
-      if (novarisThemeRaw && JSON.parse(novarisThemeRaw).data === 'dark') {
+      if (localStorage.getItem('novaris_theme') === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
       }
     } catch (e) {}

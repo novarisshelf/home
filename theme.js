@@ -1,40 +1,44 @@
 // theme.js
-// Site-wide light/dark theme — the SAME theme for every visitor, sourced
-// from a single Firestore doc (settings/site) that only the owner can write
-// (see the "settings" rule in firestore.rules). There is no per-visitor
-// toggle; regular pages just read and apply whatever the owner has set.
-// The owner changes it from the ⋮ menu on dashboard.html, which calls
-// setSiteTheme() below.
+// Tiny, dependency-free personal light/dark theme preference — mirrors how
+// i18n.js handles language. Each visitor picks their own; it's stored in
+// their browser (localStorage) and applied on every page, same as language.
+// This is NOT site-wide/shared — it doesn't touch Firestore at all, so one
+// visitor's choice never affects anyone else.
 //
-// Loaded on every page (like i18n.js/footer.js), so importing this module
-// is enough to have the current site theme applied automatically.
+// The actual on/off control lives in my-account.html's settings (⋮) menu,
+// right next to the language switcher. Every other page just imports this
+// module (already wired in via <script type="module" src="theme.js">) so
+// the visitor's saved preference gets applied consistently everywhere.
 //
-// Flash-of-wrong-theme note: since the real value lives in Firestore, a
-// pure network fetch on every page would show a flash of the light default
-// while it loads. To avoid that, the last-known value is cached in
-// localStorage (via data-cache.js) and re-applied synchronously by a tiny
-// inline snippet at the very top of each page's <head> — before anything
+// Unlike language, switching theme does NOT reload the page — it's pure
+// CSS (a single attribute flip), so the change can apply instantly.
+//
+// Flash-of-wrong-theme note: a tiny inline snippet at the very top of each
+// page's <head> re-applies the saved theme synchronously before anything
 // renders:
 //
 //   <script>
 //     try {
-//       var raw = localStorage.getItem('novaris_cache_theme');
-//       if (raw && JSON.parse(raw).data === 'dark') {
+//       if (localStorage.getItem('novaris_theme') === 'dark') {
 //         document.documentElement.setAttribute('data-theme', 'dark');
 //       }
 //     } catch (e) {}
 //   </script>
 //
-// This module then reconciles with the live Firestore value in the
-// background (stale-while-revalidate) and corrects the page if the owner
-// changed it since the last cache.
+// This module's own applyTheme(getTheme()) call on load is what makes it
+// correct even without that snippet; the snippet just avoids a flash for
+// visitors who'd chosen dark.
 
-import { db } from './firebase-config.js';
-import { cachedFetch, setCache } from './data-cache.js';
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+const STORAGE_KEY = 'novaris_theme';
 
-const THEME_CACHE_KEY = 'novaris_cache_theme';
-const THEME_TTL_MS = 2 * 60 * 1000; // 2 minutes — owner's change should reach visitors reasonably fast
+/** Current personal theme preference for this browser: 'light' | 'dark'. */
+export function getTheme() {
+  try {
+    return localStorage.getItem(STORAGE_KEY) === 'dark' ? 'dark' : 'light';
+  } catch {
+    return 'light';
+  }
+}
 
 function applyTheme(theme) {
   if (theme === 'dark') {
@@ -44,32 +48,16 @@ function applyTheme(theme) {
   }
 }
 
-async function fetchSiteThemeFromFirestore() {
-  const snap = await getDoc(doc(db, 'settings', 'site'));
-  return snap.exists() && snap.data().theme === 'dark' ? 'dark' : 'light';
-}
-
-/** Current site-wide theme ('light' | 'dark'), cached for instant repeat reads. */
-export async function getSiteTheme() {
-  try {
-    return await cachedFetch(THEME_CACHE_KEY, fetchSiteThemeFromFirestore, THEME_TTL_MS);
-  } catch {
-    return 'light'; // settings doc doesn't exist yet, or offline — light is the safe default
-  }
-}
-
-/**
- * Owner-only: changes the theme for the WHOLE site. Writes to Firestore
- * (firestore.rules restricts this to the owner's account), applies it to
- * the current page immediately, and updates the local cache so the owner
- * doesn't wait out the TTL to see it reflected on their own next page.
- */
-export async function setSiteTheme(theme) {
+/** Saves the visitor's choice and applies it immediately (no reload needed). */
+export function setTheme(theme) {
   const normalized = theme === 'dark' ? 'dark' : 'light';
-  await setDoc(doc(db, 'settings', 'site'), { theme: normalized }, { merge: true });
+  try {
+    localStorage.setItem(STORAGE_KEY, normalized);
+  } catch {
+    // localStorage unavailable — the choice just won't persist across pages/visits.
+  }
   applyTheme(normalized);
-  setCache(THEME_CACHE_KEY, normalized);
   return normalized;
 }
 
-applyTheme(await getSiteTheme());
+applyTheme(getTheme());

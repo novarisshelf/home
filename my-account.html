@@ -3,8 +3,7 @@
 <head>
   <script>
     try {
-      var novarisThemeRaw = localStorage.getItem('novaris_cache_theme');
-      if (novarisThemeRaw && JSON.parse(novarisThemeRaw).data === 'dark') {
+      if (localStorage.getItem('novaris_theme') === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
       }
     } catch (e) {}
@@ -47,6 +46,12 @@
           <button type="button" class="settings-option" data-lang="en">
             <span data-i18n="settings_lang_en">English</span>
             <i class="fa-solid fa-check settings-check" id="check-en"></i>
+          </button>
+          <div class="settings-divider"></div>
+          <div class="settings-group-label" data-i18n="settings_theme">থিম</div>
+          <button type="button" class="settings-option" id="theme-toggle-option">
+            <span data-i18n="settings_dark_theme">ডার্ক থিম</span>
+            <span class="settings-switch" id="theme-switch" aria-hidden="true"></span>
           </button>
         </div>
       </div>
@@ -113,8 +118,9 @@
     import { requireCustomerAuth, logoutCustomer } from './customer-auth.js';
     import { renderCartBadge } from './cart.js';
     import { getLang, setLang, t } from './i18n.js';
+    import { getTheme, setTheme } from './theme.js';
 
-    // ---------- Settings menu (3-dot: language now, theme later) ----------
+    // ---------- Settings menu (3-dot: language + theme, both personal) ----------
     const trigger = document.getElementById('settings-trigger');
     const dropdown = document.getElementById('settings-dropdown');
 
@@ -136,6 +142,14 @@
 
     document.querySelectorAll('.settings-option[data-lang]').forEach((btn) => {
       btn.addEventListener('click', () => setLang(btn.dataset.lang));
+    });
+
+    const themeSwitch = document.getElementById('theme-switch');
+    themeSwitch.classList.toggle('on', getTheme() === 'dark');
+    document.getElementById('theme-toggle-option').addEventListener('click', () => {
+      const next = getTheme() === 'dark' ? 'light' : 'dark';
+      setTheme(next);
+      themeSwitch.classList.toggle('on', next === 'dark');
     });
 
     // ---------- Profile ----------
