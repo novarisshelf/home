@@ -58,32 +58,38 @@
     </div>
 
     <div class="card profile-card">
-      <div class="profile-avatar-wrap">
-        <div class="profile-avatar" id="avatar">
-          <img id="avatar-img" alt="">
-          <span id="avatar-letter">?</span>
-        </div>
+      <div class="profile-loading" id="profile-loading">
+        <i class="fa-solid fa-spinner spin"></i> <span data-i18n="loading">লোড হচ্ছে…</span>
       </div>
-      <h1 class="profile-name" id="profile-name">—</h1>
-      <p class="profile-email" id="profile-email">—</p>
-      <span class="provider-badge" id="provider-badge"><i class="fa-solid fa-envelope"></i> ইমেইল</span>
-
-      <div class="profile-divider"></div>
-
-      <div class="profile-stats">
-        <div class="profile-stat">
-          <div class="profile-stat-label" data-i18n="account_dashboard_member_since">যোগ দিয়েছেন</div>
-          <div class="profile-stat-val" id="member-since">—</div>
+      <p class="msg-bar error" id="profile-error"></p>
+      <div id="profile-content" hidden>
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar" id="avatar">
+            <img id="avatar-img" alt="">
+            <span id="avatar-letter">?</span>
+          </div>
         </div>
-        <div class="profile-stat">
-          <div class="profile-stat-label" data-i18n="account_dashboard_last_signin">সর্বশেষ লগইন</div>
-          <div class="profile-stat-val" id="last-signin">—</div>
+        <h1 class="profile-name" id="profile-name">—</h1>
+        <p class="profile-email" id="profile-email">—</p>
+        <span class="provider-badge" id="provider-badge"><i class="fa-solid fa-envelope"></i> ইমেইল</span>
+
+        <div class="profile-divider"></div>
+
+        <div class="profile-stats">
+          <div class="profile-stat">
+            <div class="profile-stat-label" data-i18n="account_dashboard_member_since">যোগ দিয়েছেন</div>
+            <div class="profile-stat-val" id="member-since">—</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat-label" data-i18n="account_dashboard_last_signin">সর্বশেষ লগইন</div>
+            <div class="profile-stat-val" id="last-signin">—</div>
+          </div>
         </div>
+
+        <button type="button" class="btn btn-danger btn-block" id="logout-btn">
+          <i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="account_dashboard_logout">লগআউট</span>
+        </button>
       </div>
-
-      <button type="button" class="btn btn-danger btn-block" id="logout-btn">
-        <i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="account_dashboard_logout">লগআউট</span>
-      </button>
     </div>
 
     <p class="account-section-label" data-i18n="account_dashboard_quick_access">দ্রুত অ্যাক্সেস</p>
@@ -154,43 +160,54 @@
 
     // ---------- Profile ----------
     // Redirects to account.html if not signed in / not verified.
-    const user = await requireCustomerAuth();
+    try {
+      const user = await requireCustomerAuth();
 
-    const name = user.displayName || (user.email ? user.email.split('@')[0] : t('account_default_name'));
-    document.getElementById('profile-name').textContent = name;
-    document.getElementById('profile-email').textContent = user.email || '';
+      const name = user.displayName || (user.email ? user.email.split('@')[0] : t('account_default_name'));
+      document.getElementById('profile-name').textContent = name;
+      document.getElementById('profile-email').textContent = user.email || '';
 
-    // Avatar: Google photo if available, otherwise first-letter fallback.
-    document.getElementById('avatar-letter').textContent = name.charAt(0).toUpperCase();
-    if (user.photoURL) {
-      const img = document.getElementById('avatar-img');
-      img.referrerPolicy = 'no-referrer';
-      img.src = user.photoURL;
-      img.onload = () => {
-        img.classList.add('loaded');
-        document.getElementById('avatar-letter').style.display = 'none';
-      };
-      img.onerror = () => { img.style.display = 'none'; };
+      // Avatar: Google photo if available, otherwise first-letter fallback.
+      document.getElementById('avatar-letter').textContent = name.charAt(0).toUpperCase();
+      if (user.photoURL) {
+        const img = document.getElementById('avatar-img');
+        img.referrerPolicy = 'no-referrer';
+        img.src = user.photoURL;
+        img.onload = () => {
+          img.classList.add('loaded');
+          document.getElementById('avatar-letter').style.display = 'none';
+        };
+        img.onerror = () => { img.style.display = 'none'; };
+      }
+
+      // Provider badge.
+      const provider = user.providerData[0]?.providerId || 'password';
+      document.getElementById('provider-badge').innerHTML = provider === 'google.com'
+        ? '<i class="fa-brands fa-google"></i> Google'
+        : `<i class="fa-solid fa-envelope"></i> ${t('account_email')}`;
+
+      // Stats.
+      const fmt = (iso) => iso
+        ? new Date(iso).toLocaleDateString(currentLang === 'bn' ? 'bn-BD' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' })
+        : '—';
+      document.getElementById('member-since').textContent = fmt(user.metadata?.creationTime);
+      document.getElementById('last-signin').textContent = fmt(user.metadata?.lastSignInTime);
+
+      // Logout.
+      document.getElementById('logout-btn').addEventListener('click', async () => {
+        await logoutCustomer();
+        window.location.href = 'index.html';
+      });
+
+      document.getElementById('profile-loading').hidden = true;
+      document.getElementById('profile-content').hidden = false;
+    } catch (err) {
+      console.error('Could not load account profile:', err);
+      document.getElementById('profile-loading').hidden = true;
+      const errorEl = document.getElementById('profile-error');
+      errorEl.textContent = t('account_load_error');
+      errorEl.classList.add('show');
     }
-
-    // Provider badge.
-    const provider = user.providerData[0]?.providerId || 'password';
-    document.getElementById('provider-badge').innerHTML = provider === 'google.com'
-      ? '<i class="fa-brands fa-google"></i> Google'
-      : `<i class="fa-solid fa-envelope"></i> ${t('account_email')}`;
-
-    // Stats.
-    const fmt = (iso) => iso
-      ? new Date(iso).toLocaleDateString(currentLang === 'bn' ? 'bn-BD' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' })
-      : '—';
-    document.getElementById('member-since').textContent = fmt(user.metadata?.creationTime);
-    document.getElementById('last-signin').textContent = fmt(user.metadata?.lastSignInTime);
-
-    // Logout.
-    document.getElementById('logout-btn').addEventListener('click', async () => {
-      await logoutCustomer();
-      window.location.href = 'index.html';
-    });
 
     renderCartBadge();
   </script>

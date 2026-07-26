@@ -129,6 +129,7 @@ const dict = {
     account_min_chars: 'ন্যূনতম ৮ ক্যারেক্টার',
     account_confirm_password: 'পাসওয়ার্ড আবার লিখুন',
     account_default_name: 'কাস্টমার',
+    account_load_error: 'প্রোফাইল লোড করা যায়নি। পেজ রিফ্রেশ করে আবার চেষ্টা করুন।',
 
     // my-orders.html
     orders_title: 'আমার অর্ডার',
@@ -324,6 +325,7 @@ const dict = {
     account_min_chars: 'Minimum 8 characters',
     account_confirm_password: 'Confirm password',
     account_default_name: 'Customer',
+    account_load_error: 'Could not load your profile. Please refresh and try again.',
 
     orders_title: 'My Orders',
     orders_loading: 'Loading orders…',
