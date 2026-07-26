@@ -4,6 +4,7 @@
 // books.js to read from Firestore too (see the TODO at the top of that file).
 
 import { db } from './firebase-config.js';
+import { clearCache } from './data-cache.js';
 import {
   collection,
   getDocs,
@@ -23,7 +24,7 @@ export async function fetchBooksLive() {
 }
 
 export function addBook(bookData) {
-  return addDoc(collection(db, 'books'), bookData);
+  return addDoc(collection(db, 'books'), bookData).finally(() => clearCache('novaris_cache_books'));
 }
 
 export function updateBook(id, bookData) {
@@ -34,9 +35,9 @@ export function updateBook(id, bookData) {
   if (data.regularPrice === null) {
     data.regularPrice = deleteField();
   }
-  return updateDoc(doc(db, 'books', id), data);
+  return updateDoc(doc(db, 'books', id), data).finally(() => clearCache('novaris_cache_books'));
 }
 
 export function deleteBook(id) {
-  return deleteDoc(doc(db, 'books', id));
+  return deleteDoc(doc(db, 'books', id)).finally(() => clearCache('novaris_cache_books'));
 }

@@ -10,6 +10,7 @@
 
 import { db } from './firebase-config.js';
 import { t } from './i18n.js';
+import { cachedFetch } from './data-cache.js';
 import {
   collection,
   getDocs,
@@ -115,26 +116,21 @@ const PLACEHOLDER_DECOR_ITEMS = [
   }
 ];
 
-let cachedDecorItems = null;
-let cachedDecorItemsPromise = null;
-
-/** All decor items, live from Firestore (falls back to placeholders — see notes above). */
+/** All decor items, live from Firestore, cached in localStorage so page navigation is instant (falls back to placeholders — see notes above). */
 export async function getAllDecorItems() {
-  if (cachedDecorItems) return cachedDecorItems;
-  if (!cachedDecorItemsPromise) cachedDecorItemsPromise = fetchDecorItemsWithFallback();
-  cachedDecorItems = await cachedDecorItemsPromise;
-  return cachedDecorItems;
-}
-
-async function fetchDecorItemsWithFallback() {
   try {
-    const snapshot = await getDocs(collection(db, 'decorItems'));
-    const liveItems = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-    return liveItems.length > 0 ? liveItems : PLACEHOLDER_DECOR_ITEMS;
+    return await cachedFetch('novaris_cache_decor', fetchDecorItemsFromFirestore);
   } catch (err) {
     console.warn('Could not load decor items from Firestore, showing placeholder catalog:', err);
     return PLACEHOLDER_DECOR_ITEMS;
   }
+}
+
+async function fetchDecorItemsFromFirestore() {
+  const snapshot = await getDocs(collection(db, 'decorItems'));
+  const liveItems = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+  if (liveItems.length === 0) throw new Error('EMPTY_COLLECTION');
+  return liveItems;
 }
 
 /** Single decor item by id, or null if not found. */

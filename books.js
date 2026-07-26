@@ -10,6 +10,7 @@
 
 import { db } from './firebase-config.js';
 import { t } from './i18n.js';
+import { cachedFetch } from './data-cache.js';
 import {
   collection,
   getDocs,
@@ -273,26 +274,21 @@ const PLACEHOLDER_BOOKS = [
   }
 ];
 
-/** All books, live from Firestore (falls back to placeholders — see notes above). */
-let cachedBooks = null;
-let cachedBooksPromise = null;
-
+/** All books, live from Firestore, cached in localStorage so page navigation is instant (falls back to placeholders — see notes above). */
 export async function getAllBooks() {
-  if (cachedBooks) return cachedBooks;
-  if (!cachedBooksPromise) cachedBooksPromise = fetchBooksWithFallback();
-  cachedBooks = await cachedBooksPromise;
-  return cachedBooks;
-}
-
-async function fetchBooksWithFallback() {
   try {
-    const snapshot = await getDocs(collection(db, 'books'));
-    const liveBooks = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-    return liveBooks.length > 0 ? liveBooks : PLACEHOLDER_BOOKS;
+    return await cachedFetch('novaris_cache_books', fetchBooksFromFirestore);
   } catch (err) {
     console.warn('Could not load books from Firestore, showing placeholder catalog:', err);
     return PLACEHOLDER_BOOKS;
   }
+}
+
+async function fetchBooksFromFirestore() {
+  const snapshot = await getDocs(collection(db, 'books'));
+  const liveBooks = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+  if (liveBooks.length === 0) throw new Error('EMPTY_COLLECTION');
+  return liveBooks;
 }
 
 /** Single book by id, or null if not found. Checks the live/placeholder cache first, then Firestore directly. */

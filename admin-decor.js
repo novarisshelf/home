@@ -4,6 +4,7 @@
 // "decorItems" collection instead of "books".
 
 import { db } from './firebase-config.js';
+import { clearCache } from './data-cache.js';
 import {
   collection,
   getDocs,
@@ -23,7 +24,7 @@ export async function fetchDecorItemsLive() {
 }
 
 export function addDecorItem(itemData) {
-  return addDoc(collection(db, 'decorItems'), itemData);
+  return addDoc(collection(db, 'decorItems'), itemData).finally(() => clearCache('novaris_cache_decor'));
 }
 
 export function updateDecorItem(id, itemData) {
@@ -33,9 +34,9 @@ export function updateDecorItem(id, itemData) {
   if (data.regularPrice === null) {
     data.regularPrice = deleteField();
   }
-  return updateDoc(doc(db, 'decorItems', id), data);
+  return updateDoc(doc(db, 'decorItems', id), data).finally(() => clearCache('novaris_cache_decor'));
 }
 
 export function deleteDecorItem(id) {
-  return deleteDoc(doc(db, 'decorItems', id));
+  return deleteDoc(doc(db, 'decorItems', id)).finally(() => clearCache('novaris_cache_decor'));
 }
