@@ -38,41 +38,71 @@
 }
 
 /* ---------- Dark theme ----------
-   Follows the visitor's device/browser dark-mode setting automatically —
-   no toggle needed. Since every component below is already built on these
-   variables, retheming here is enough; no component rules need touching. */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #1B1512;
-    --color-bg-shelf: #241C18;
-    --color-primary: #C24A56;
-    --color-primary-dark: #9B3540;
-    --color-accent: #E0BB4A;
-    --color-accent-dark: #C9A227;
-    --color-text: #F2EAE1;
-    --color-text-muted: #B8AA9E;
-    --color-footer: #120D0B;
-    --color-discount: #E5484D;
-    --color-border: #43362F;
-    --color-surface: #2A211D;
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45);
-    --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.5);
-    --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.55);
-  }
+   Manual toggle only (via the light/dark button theme.js adds to the
+   navbar) — light is always the default for a new visitor. If someone has
+   switched to dark before, that choice is remembered (localStorage) and
+   re-applied via the [data-theme="dark"] attribute on <html>. Since every
+   component below is already built on these variables, retheming here is
+   enough; no component rules need touching. */
+html[data-theme="dark"] {
+  --color-bg: #1B1512;
+  --color-bg-shelf: #241C18;
+  --color-primary: #C24A56;
+  --color-primary-dark: #9B3540;
+  --color-accent: #E0BB4A;
+  --color-accent-dark: #C9A227;
+  --color-text: #F2EAE1;
+  --color-text-muted: #B8AA9E;
+  --color-footer: #120D0B;
+  --color-discount: #E5484D;
+  --color-border: #43362F;
+  --color-surface: #2A211D;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.55);
+}
 
-  /* A handful of status/message colors are hardcoded (not variable-based)
-     because they carry fixed semantic meaning (success/error/pending etc).
-     Same hues, recalibrated so they read clearly on a dark surface instead
-     of as washed-out pastel patches. */
-  .msg-bar.success { background: #1C3324; color: #6FCF97; border-color: rgba(111, 207, 151, 0.3); }
-  .msg-bar.error { background: #3A2323; color: #F28B82; border-color: rgba(242, 139, 130, 0.3); }
-  .msg-bar.loading, .info-note { background: #3A311C; border-color: rgba(224, 187, 74, 0.3); }
-  .stock-msg { background: #3A2323; }
-  .status-pending { background: #3A311C; color: #E0BB4A; }
-  .status-confirmed { background: #1E2E3F; color: #7FB0E8; }
-  .status-on_the_way { background: #3D2D1A; color: #E8A75C; }
-  .status-delivered { background: #1C3324; color: #6FCF97; }
-  .status-cancelled, .order-cancelled-badge { background: #3A2323; color: #F28B82; }
+/* A handful of status/message colors are hardcoded (not variable-based)
+   because they carry fixed semantic meaning (success/error/pending etc).
+   Same hues, recalibrated so they read clearly on a dark surface instead
+   of as washed-out pastel patches. */
+html[data-theme="dark"] .msg-bar.success { background: #1C3324; color: #6FCF97; border-color: rgba(111, 207, 151, 0.3); }
+html[data-theme="dark"] .msg-bar.error { background: #3A2323; color: #F28B82; border-color: rgba(242, 139, 130, 0.3); }
+html[data-theme="dark"] .msg-bar.loading, html[data-theme="dark"] .info-note { background: #3A311C; border-color: rgba(224, 187, 74, 0.3); }
+html[data-theme="dark"] .stock-msg { background: #3A2323; }
+html[data-theme="dark"] .status-pending { background: #3A311C; color: #E0BB4A; }
+html[data-theme="dark"] .status-confirmed { background: #1E2E3F; color: #7FB0E8; }
+html[data-theme="dark"] .status-on_the_way { background: #3D2D1A; color: #E8A75C; }
+html[data-theme="dark"] .status-delivered { background: #1C3324; color: #6FCF97; }
+html[data-theme="dark"] .status-cancelled, html[data-theme="dark"] .order-cancelled-badge { background: #3A2323; color: #F28B82; }
+
+/* Toggle button itself — same "circle on the navbar" treatment as .navbar-cart,
+   so it fits right in wherever theme.js mounts it (customer navbar, owner
+   bar, or the plain login navbar). */
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 253, 249, 0.12);
+  color: var(--color-white);
+  font-size: 0.85rem;
+  transition: background var(--transition);
+}
+.theme-toggle-btn:hover { background: rgba(255, 253, 249, 0.22); }
+/* Defensive fallback only — every current page has a navbar/owner-bar for
+   theme.js to mount into, so this shouldn't normally be needed. */
+.theme-toggle-floating {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 60;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-md);
 }
 
 /* ---------- Reset ---------- */

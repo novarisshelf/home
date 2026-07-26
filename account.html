@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
+  <script>
+    try {
+      if (localStorage.getItem('novaris_theme') === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    } catch (e) {}
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Novaris — লগইন / সাইন আপ</title>
@@ -471,6 +478,7 @@
     document.getElementById('go-to-login-btn').addEventListener('click', () => switchTab('login'));
   </script>
   <script type="module" src="footer.js"></script>
+  <script type="module" src="theme.js"></script>
   <script type="module" src="whatsapp-float.js"></script>
 </body>
 </html>
