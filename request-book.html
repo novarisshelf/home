@@ -32,9 +32,23 @@
 
   <div class="container">
     <a href="index.html" class="back-link" data-i18n="back_home"><i class="fa-solid fa-arrow-left"></i> হোমে ফিরুন</a>
-    <h1 data-i18n="book_request_title">বই রিকোয়েস্ট করুন</h1>
-    <p class="catalog-subheading" style="margin-bottom: 20px;" data-i18n="book_request_sub">আপনার পছন্দের বইটি খুঁজে পাচ্ছেন না? নিচের ফর্মটি পূরণ করুন — আমরা বইটি সংগ্রহ করে আপনার ঠিকানায় পৌঁছে দেব।</p>
 
+    <div class="request-page-head">
+      <div>
+        <h1 data-i18n="book_request_title">বই রিকোয়েস্ট করুন</h1>
+        <p class="catalog-subheading" style="margin-bottom: 20px;" data-i18n="book_request_sub">আপনার পছন্দের বইটি খুঁজে পাচ্ছেন না? নিচের ফর্মটি পূরণ করুন — আমরা বইটি সংগ্রহ করে আপনার ঠিকানায় পৌঁছে দেব।</p>
+      </div>
+      <button type="button" id="history-toggle-btn" class="btn btn-outline" style="display:none;">
+        <i class="fa-solid fa-clock-rotate-left"></i> <span data-i18n="book_request_history_btn">হিস্ট্রি</span>
+      </button>
+    </div>
+
+    <div class="info-note" id="login-save-note" style="display:none;">
+      <i class="fa-solid fa-circle-info"></i>
+      <p data-i18n-html="book_request_login_note">ভবিষ্যতের জন্য তথ্য সংরক্ষণ করতে ও আপনার রিকোয়েস্ট হিস্ট্রি দেখতে <a href="account.html">লগইন করুন</a>।</p>
+    </div>
+
+    <div id="request-form-view">
     <div class="card book-request-card">
       <form id="book-request-form" novalidate>
         <div class="form-row">
@@ -86,6 +100,14 @@
         </div>
       </form>
     </div>
+    </div>
+
+    <div id="request-history-view" style="display:none;">
+      <h2 data-i18n="book_request_history_title">আপনার রিকোয়েস্ট হিস্ট্রি</h2>
+      <div id="history-list">
+        <p class="loading-state" data-i18n="loading">লোড হচ্ছে…</p>
+      </div>
+    </div>
   </div>
 
   <div class="modal-overlay" id="book-request-modal-overlay">
@@ -101,14 +123,31 @@
 
   <script type="module">
     // Book Request form — sends straight to novarisshelf@gmail.com via
-    // formsubmit.co's AJAX endpoint. No backend/Firebase needed. No login
-    // required either — anyone can submit this form.
+    // formsubmit.co's AJAX endpoint. No backend/Firebase needed for the
+    // email itself, and login is NOT required to submit this form.
+    //
+    // Login is optional, but when a customer IS logged in, each submission
+    // is also saved to Firestore (bookRequests/{id}, tagged with their uid)
+    // so they can look back at their past requests via the History toggle
+    // below. Logged-out visitors just see a note suggesting they log in for
+    // that — their request still goes out fine by email either way.
     //
     // NOTE: the first-ever submission to a new formsubmit.co address triggers
     // a one-time "activate this endpoint" email to novarisshelf@gmail.com —
     // someone needs to open it and click the confirm link once, or emails
     // after that first request won't arrive.
-    import { t } from './i18n.js';
+    import { t, getLang } from './i18n.js';
+    import { onCustomerAuthChanged } from './customer-auth.js';
+    import { db } from './firebase-config.js';
+    import {
+      collection,
+      addDoc,
+      query,
+      where,
+      orderBy,
+      getDocs,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
     const FORM_ENDPOINT = 'https://formsubmit.co/ajax/novarisshelf@gmail.com';
 
@@ -117,6 +156,16 @@
     const reqErrorBar = document.getElementById('book-request-error');
     const reqModalOverlay = document.getElementById('book-request-modal-overlay');
     const reqModalClose = document.getElementById('book-request-modal-close');
+
+    const historyToggleBtn = document.getElementById('history-toggle-btn');
+    const loginSaveNote = document.getElementById('login-save-note');
+    const formView = document.getElementById('request-form-view');
+    const historyView = document.getElementById('request-history-view');
+    const historyList = document.getElementById('history-list');
+
+    let currentUser = null;
+    let showingHistory = false;
+    let historyLoaded = false;
 
     function openRequestModal() {
       reqModalOverlay.classList.add('show');
@@ -135,6 +184,90 @@
       if (e.key === 'Escape' && reqModalOverlay.classList.contains('show')) closeRequestModal();
     });
 
+    // ---------- History toggle (logged-in customers only) ----------
+    function setToggleLabel() {
+      historyToggleBtn.innerHTML = showingHistory
+        ? `<i class="fa-solid fa-arrow-left"></i> <span>${t('book_request_new_request')}</span>`
+        : `<i class="fa-solid fa-clock-rotate-left"></i> <span>${t('book_request_history_btn')}</span>`;
+    }
+
+    function showFormView() {
+      showingHistory = false;
+      formView.style.display = '';
+      historyView.style.display = 'none';
+      setToggleLabel();
+    }
+
+    async function showHistoryView() {
+      showingHistory = true;
+      formView.style.display = 'none';
+      historyView.style.display = '';
+      setToggleLabel();
+      if (!historyLoaded) await loadHistory();
+    }
+
+    function formatTime(ts) {
+      if (!ts || !ts.toDate) return '';
+      return ts.toDate().toLocaleString(getLang() === 'bn' ? 'bn-BD' : 'en-US', { dateStyle: 'medium', timeStyle: 'short' });
+    }
+
+    async function loadHistory() {
+      if (!currentUser) return;
+      try {
+        const q = query(
+          collection(db, 'bookRequests'),
+          where('customerUid', '==', currentUser.uid),
+          orderBy('createdAt', 'desc')
+        );
+        const snapshot = await getDocs(q);
+        const items = snapshot.docs.map((d) => d.data());
+        historyLoaded = true;
+
+        if (items.length === 0) {
+          historyList.innerHTML = `
+            <div class="empty-state">
+              <i class="fa-solid fa-book"></i>
+              <p>${t('book_request_history_empty')}</p>
+            </div>
+          `;
+          return;
+        }
+
+        historyList.innerHTML = items.map((r) => `
+          <div class="card order-card request-history-item">
+            <div class="order-card-head">
+              <p class="order-time">${formatTime(r.createdAt)}</p>
+            </div>
+            <p class="order-items-list"><strong>${r.bookTitle || ''}</strong> — ${r.authorName || ''}</p>
+            <p class="request-history-note">${[r.edition, r.deliveryAddress].filter(Boolean).join(' · ')}</p>
+            ${r.additionalInfo ? `<p class="request-history-note">${r.additionalInfo}</p>` : ''}
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error('Could not load request history:', err);
+        historyList.innerHTML = `<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><p>${t('error_generic')}</p></div>`;
+      }
+    }
+
+    historyToggleBtn.addEventListener('click', () => {
+      if (showingHistory) showFormView(); else showHistoryView();
+    });
+
+    onCustomerAuthChanged((user) => {
+      if (user && user.emailVerified) {
+        currentUser = user;
+        historyToggleBtn.style.display = 'inline-flex';
+        loginSaveNote.style.display = 'none';
+        historyLoaded = false;
+      } else {
+        currentUser = null;
+        historyToggleBtn.style.display = 'none';
+        loginSaveNote.style.display = 'flex';
+        showFormView();
+      }
+    });
+
+    // ---------- Form submit ----------
     reqForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       reqErrorBar.classList.remove('show');
@@ -169,6 +302,29 @@
           body: JSON.stringify(payload)
         });
         if (!res.ok) throw new Error('Request failed with status ' + res.status);
+
+        // Best-effort: also save to Firestore so a logged-in customer can
+        // see this request later under History. The email above is still
+        // the source of truth for the owner, so a failure here never blocks
+        // the success message.
+        if (currentUser) {
+          try {
+            await addDoc(collection(db, 'bookRequests'), {
+              customerUid: currentUser.uid,
+              customerName: payload.customer_name,
+              contactNumber: payload.contact_number,
+              bookTitle: payload.book_title,
+              authorName: payload.author_name,
+              edition: payload.edition,
+              deliveryAddress: payload.delivery_address,
+              additionalInfo: payload.additional_info,
+              createdAt: serverTimestamp()
+            });
+            historyLoaded = false;
+          } catch (err) {
+            console.error('Could not save request to history:', err);
+          }
+        }
 
         reqForm.reset();
         openRequestModal();

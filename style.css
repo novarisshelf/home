@@ -292,6 +292,31 @@ h3 { font-size: 1.15rem; }
 }
 #book-request-error { margin-top: 16px; }
 
+/* ---------- Standalone request-book.html: header row + history toggle ---------- */
+.request-page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.request-page-head .btn { flex-shrink: 0; }
+@media (max-width: 560px) {
+  .request-page-head { flex-direction: column; }
+  .request-page-head .btn { width: 100%; }
+}
+#login-save-note { max-width: 620px; margin: 0 auto 18px; }
+#login-save-note a { color: var(--color-primary); font-weight: 700; text-decoration: underline; }
+#request-history-view { max-width: 620px; margin: 0 auto 40px; }
+#request-history-view h2 { font-size: 1.1rem; }
+.request-history-item { margin-bottom: 14px; }
+.request-history-item .order-items-list { margin: 6px 0 2px; }
+.request-history-item .request-history-note {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin: 4px 0 0;
+}
+
 /* Homepage CTA banner — points to the standalone request-book.html page
    instead of embedding the form again (kept in one place only). */
 .book-request-cta {

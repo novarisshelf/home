@@ -205,6 +205,11 @@ const dict = {
     book_request_success_title: 'ধন্যবাদ! 🎉',
     book_request_success_msg: 'আপনার রিকোয়েস্ট আমরা পেয়েছি। শীঘ্রই আমরা আপনার সাথে যোগাযোগ করব।',
     book_request_close: 'ঠিক আছে',
+    book_request_history_btn: 'হিস্ট্রি',
+    book_request_new_request: 'নতুন রিকোয়েস্ট',
+    book_request_login_note: 'ভবিষ্যতের জন্য তথ্য সংরক্ষণ করতে ও আপনার রিকোয়েস্ট হিস্ট্রি দেখতে <a href="account.html">লগইন করুন</a>।',
+    book_request_history_title: 'আপনার রিকোয়েস্ট হিস্ট্রি',
+    book_request_history_empty: 'আপনি এখনো কোনো বই রিকোয়েস্ট করেননি।',
 
     // dashboard.html (owner orders)
     owner_orders_title: 'অর্ডার ইতিহাস',
@@ -425,6 +430,11 @@ const dict = {
     book_request_success_title: 'Thank you! 🎉',
     book_request_success_msg: "We've received your request. We'll be in touch with you soon.",
     book_request_close: 'OK',
+    book_request_history_btn: 'History',
+    book_request_new_request: 'New Request',
+    book_request_login_note: 'Save your information for the future and view your request history — <a href="account.html">log in here</a>.',
+    book_request_history_title: 'Your Request History',
+    book_request_history_empty: "You haven't requested any books yet.",
 
     owner_orders_title: 'Order History',
     owner_orders_empty: 'No orders have come in yet.',
