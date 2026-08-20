@@ -292,6 +292,43 @@ h3 { font-size: 1.15rem; }
 }
 #book-request-error { margin-top: 16px; }
 
+/* Homepage CTA banner — points to the standalone request-book.html page
+   instead of embedding the form again (kept in one place only). */
+.book-request-cta {
+  max-width: 700px;
+  margin: 22px auto 40px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.book-request-cta-icon {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-bg-shelf);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+.book-request-cta-text { flex: 1; }
+.book-request-cta-text h2 {
+  font-size: 1.2rem;
+  margin: 0 0 4px;
+}
+.book-request-cta-text p {
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+  margin: 0;
+}
+.book-request-cta-btn { flex-shrink: 0; white-space: nowrap; }
+@media (max-width: 560px) {
+  .book-request-cta { flex-direction: column; text-align: center; }
+  .book-request-cta-btn { width: 100%; }
+}
+
 /* ---------- Confirmation modal ---------- */
 .modal-overlay {
   display: none;

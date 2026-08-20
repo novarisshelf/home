@@ -183,6 +183,8 @@ const dict = {
     // Book Request section (homepage)
     book_request_title: 'বই রিকোয়েস্ট করুন',
     book_request_sub: 'আপনার পছন্দের বইটি খুঁজে পাচ্ছেন না? নিচের ফর্মটি পূরণ করুন — আমরা বইটি সংগ্রহ করে আপনার ঠিকানায় পৌঁছে দেব।',
+    book_request_home_teaser: 'আপনার পছন্দের বইটি খুঁজে পাচ্ছেন না? আমাদের বই রিকোয়েস্ট পেজে গিয়ে জানিয়ে দিন — আমরা বইটি সংগ্রহ করে আপনার ঠিকানায় পৌঁছে দেব।',
+    book_request_cta_link: 'রিকোয়েস্ট পেজে যান',
     book_request_name_label: 'আপনার নাম',
     book_request_name_placeholder: 'আপনার পুরো নাম',
     book_request_phone_label: 'যোগাযোগের নম্বর',
@@ -401,6 +403,8 @@ const dict = {
     // Book Request section (homepage)
     book_request_title: 'Request a Book',
     book_request_sub: "Can't find the book you're looking for? Fill out the form below — we'll source it and deliver it to your address.",
+    book_request_home_teaser: "Can't find the book you want? Head over to our Book Request page and let us know — we'll source it and deliver it to your address.",
+    book_request_cta_link: 'Go to Request Page',
     book_request_name_label: 'Your Name',
     book_request_name_placeholder: 'Your full name',
     book_request_phone_label: 'Contact Number',
