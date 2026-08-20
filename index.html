@@ -72,6 +72,75 @@
     <div class="book-grid" id="search-results-grid"></div>
   </section>
 
+  <section id="book-request">
+    <div class="container">
+      <h2 class="catalog-heading" data-i18n="book_request_title">বই রিকোয়েস্ট করুন</h2>
+      <p class="catalog-subheading" data-i18n="book_request_sub">আপনার পছন্দের বইটি খুঁজে পাচ্ছেন না? নিচের ফর্মটি পূরণ করুন — আমরা বইটি সংগ্রহ করে আপনার ঠিকানায় পৌঁছে দেব।</p>
+    </div>
+    <div class="container">
+      <div class="card book-request-card">
+        <form id="book-request-form" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="req-name" data-i18n="book_request_name_label">আপনার নাম *</label>
+              <input class="form-input" type="text" id="req-name" name="req-name" data-i18n-placeholder="book_request_name_placeholder" placeholder="আপনার পুরো নাম" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="req-phone" data-i18n="book_request_phone_label">যোগাযোগের নম্বর *</label>
+              <input class="form-input" type="tel" id="req-phone" name="req-phone" data-i18n-placeholder="book_request_phone_placeholder" placeholder="+৮৮০ ১XXX-XXXXXX" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="req-book" data-i18n="book_request_book_label">বইয়ের নাম *</label>
+              <input class="form-input" type="text" id="req-book" name="req-book" data-i18n-placeholder="book_request_book_placeholder" placeholder="যেমন: শেষের কবিতা" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="req-author" data-i18n="book_request_author_label">লেখকের নাম *</label>
+              <input class="form-input" type="text" id="req-author" name="req-author" data-i18n-placeholder="book_request_author_placeholder" placeholder="যেমন: রবীন্দ্রনাথ ঠাকুর" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="req-edition" data-i18n="book_request_edition_label">সংস্করণ *</label>
+            <input class="form-input" type="text" id="req-edition" name="req-edition" data-i18n-placeholder="book_request_edition_placeholder" placeholder="যেমন: ১ম সংস্করণ / ভারতীয় সংস্করণ" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="req-address" data-i18n="book_request_address_label">ডেলিভারি ঠিকানা *</label>
+            <textarea class="form-textarea" id="req-address" name="req-address" rows="2" data-i18n-placeholder="book_request_address_placeholder" placeholder="সম্পূর্ণ ঠিকানা লিখুন (বাসা/রোড/এলাকা/শহর)" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="req-note" data-i18n="book_request_note_label">অতিরিক্ত তথ্য (ঐচ্ছিক)</label>
+            <textarea class="form-textarea" id="req-note" name="req-note" rows="2" data-i18n-placeholder="book_request_note_placeholder" placeholder="বইটি সংগ্রহ করতে সাহায্য হবে এমন কোনো তথ্য থাকলে লিখুন — প্রকাশনী, কভার, কোথায় পাওয়া যায় ইত্যাদি"></textarea>
+          </div>
+
+          <!-- Spam honeypot (formsubmit.co convention) — left blank by real visitors -->
+          <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+
+          <button type="submit" class="btn btn-primary btn-block" id="book-request-submit">
+            <i class="fa-solid fa-paper-plane"></i> <span data-i18n="book_request_submit">রিকোয়েস্ট পাঠান</span>
+          </button>
+
+          <div class="msg-bar error" id="book-request-error">
+            <i class="fa-solid fa-triangle-exclamation"></i> <span data-i18n="book_request_error">কিছু একটা সমস্যা হয়েছে। আবার চেষ্টা করুন, অথবা সরাসরি ফোন করুন।</span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <div class="modal-overlay" id="book-request-modal-overlay">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="book-request-modal-title">
+      <div class="modal-icon"><i class="fa-solid fa-check"></i></div>
+      <h3 id="book-request-modal-title" data-i18n="book_request_success_title">ধন্যবাদ! 🎉</h3>
+      <p data-i18n="book_request_success_msg">আপনার রিকোয়েস্ট আমরা পেয়েছি। শীঘ্রই আমরা আপনার সাথে যোগাযোগ করব।</p>
+      <button type="button" class="btn btn-primary" id="book-request-modal-close" data-i18n="book_request_close">ঠিক আছে</button>
+    </div>
+  </div>
+
   <div id="site-footer"></div>
 
   <script type="module">
@@ -219,6 +288,89 @@
 
     init();
   </script>
+
+  <script type="module">
+    // Book Request form (homepage) — sends straight to novarisshelf@gmail.com
+    // via formsubmit.co's AJAX endpoint. No backend/Firebase needed.
+    //
+    // NOTE: the first-ever submission to a new formsubmit.co address triggers
+    // a one-time "activate this endpoint" email to novarisshelf@gmail.com —
+    // someone needs to open it and click the confirm link once, or emails
+    // after that first request won't arrive.
+    import { t } from './i18n.js';
+
+    const FORM_ENDPOINT = 'https://formsubmit.co/ajax/novarisshelf@gmail.com';
+
+    const reqForm = document.getElementById('book-request-form');
+    const reqSubmitBtn = document.getElementById('book-request-submit');
+    const reqErrorBar = document.getElementById('book-request-error');
+    const reqModalOverlay = document.getElementById('book-request-modal-overlay');
+    const reqModalClose = document.getElementById('book-request-modal-close');
+
+    function openRequestModal() {
+      reqModalOverlay.classList.add('show');
+      document.body.style.overflow = 'hidden';
+      reqModalClose.focus();
+    }
+    function closeRequestModal() {
+      reqModalOverlay.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+    reqModalClose.addEventListener('click', closeRequestModal);
+    reqModalOverlay.addEventListener('click', (e) => {
+      if (e.target === reqModalOverlay) closeRequestModal();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && reqModalOverlay.classList.contains('show')) closeRequestModal();
+    });
+
+    reqForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      reqErrorBar.classList.remove('show');
+
+      if (!reqForm.checkValidity()) {
+        reqForm.reportValidity();
+        return;
+      }
+
+      const payload = {
+        customer_name: document.getElementById('req-name').value.trim(),
+        contact_number: document.getElementById('req-phone').value.trim(),
+        book_title: document.getElementById('req-book').value.trim(),
+        author_name: document.getElementById('req-author').value.trim(),
+        edition: document.getElementById('req-edition').value.trim(),
+        delivery_address: document.getElementById('req-address').value.trim(),
+        additional_info: document.getElementById('req-note').value.trim() || 'দেওয়া হয়নি',
+        _subject: 'নতুন বই রিকোয়েস্ট — Novaris',
+        _template: 'table',
+        _captcha: 'false',
+        _honey: ''
+      };
+
+      reqSubmitBtn.disabled = true;
+      const originalBtnHTML = reqSubmitBtn.innerHTML;
+      reqSubmitBtn.innerHTML = `<i class="fa-solid fa-circle-notch spin"></i> ${t('book_request_sending')}`;
+
+      try {
+        const res = await fetch(FORM_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('Request failed with status ' + res.status);
+
+        reqForm.reset();
+        openRequestModal();
+      } catch (err) {
+        console.error('Book request submit failed:', err);
+        reqErrorBar.classList.add('show');
+      } finally {
+        reqSubmitBtn.disabled = false;
+        reqSubmitBtn.innerHTML = originalBtnHTML;
+      }
+    });
+  </script>
+
   <script type="module" src="customer-nav.js"></script>
   <script type="module" src="footer.js"></script>
   <script type="module" src="theme.js"></script>
