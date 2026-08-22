@@ -11,12 +11,25 @@
 import { db } from './firebase-config.js';
 import { t } from './i18n.js';
 import { cachedFetch } from './data-cache.js';
+import { generateCoverArt } from './cover-art.js';
 import {
   collection,
   getDocs,
   doc,
   getDoc
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+// Genre → cover palette (kept separate from PLACEHOLDER_BOOKS so real
+// Firestore books can reuse it too, via getCoverForGenre below).
+const GENRE_PALETTE = {
+  'বিজ্ঞান': 'maroon',
+  'উপন্যাস': 'gold',
+  'কবিতা': 'charcoal'
+};
+
+function coverFor(title, author, genre) {
+  return generateCoverArt(title, author, GENRE_PALETTE[genre] || 'maroon');
+}
 
 const PLACEHOLDER_BOOKS = [
   // ---------- বিজ্ঞান (Science) ----------
@@ -29,7 +42,7 @@ const PLACEHOLDER_BOOKS = [
     regularPrice: 420,
     description: 'মহাবিশ্বের জন্ম থেকে বর্তমান পর্যন্ত এক সহজবোধ্য বিজ্ঞানভিত্তিক ভ্রমণ। জ্যোতির্বিজ্ঞানের জটিল ধারণাগুলো সাধারণ পাঠকের জন্য সহজ ভাষায় তুলে ধরা হয়েছে।',
     genre: 'বিজ্ঞান',
-    coverImage: 'https://placehold.co/300x450/7A1F2B/FAF6F0?text=Novaris',
+    coverImage: coverFor('মহাবিশ্বের গল্প', 'রফিক আহমেদ', 'বিজ্ঞান'),
     inStock: true,
     publisher: 'জ্ঞানকোষ প্রকাশনী',
     edition: '২য় সংস্করণ',
@@ -44,7 +57,7 @@ const PLACEHOLDER_BOOKS = [
     currentPrice: 300,
     description: 'কোয়ান্টাম বলবিদ্যার অদ্ভুত ও চমকপ্রদ জগৎ নিয়ে একটি প্রাথমিক পরিচিতিমূলক বই।',
     genre: 'বিজ্ঞান',
-    coverImage: 'https://placehold.co/300x450/7A1F2B/FAF6F0?text=Novaris',
+    coverImage: coverFor('কোয়ান্টাম রহস্য', 'সালমা বেগম', 'বিজ্ঞান'),
     inStock: true
   },
   {
@@ -56,7 +69,7 @@ const PLACEHOLDER_BOOKS = [
     regularPrice: 450,
     description: 'মানুষের মস্তিষ্ক কীভাবে চিন্তা করে, শেখে এবং স্মৃতি ধরে রাখে — স্নায়ুবিজ্ঞানের একটি প্রাঞ্জল ভূমিকা।',
     genre: 'বিজ্ঞান',
-    coverImage: 'https://placehold.co/300x450/7A1F2B/FAF6F0?text=Novaris',
+    coverImage: coverFor('মস্তিষ্কের ভেতরে', 'তানভীর হোসেন', 'বিজ্ঞান'),
     inStock: false,
     publisher: 'দিগন্ত প্রকাশন',
     bindingType: 'Hardcover',
@@ -70,7 +83,7 @@ const PLACEHOLDER_BOOKS = [
     currentPrice: 320,
     description: 'কোষ থেকে বাস্তুতন্ত্র পর্যন্ত — জীবজগতের বিস্ময়কর দিকগুলোর সহজ পাঠ।',
     genre: 'বিজ্ঞান',
-    coverImage: 'https://placehold.co/300x450/7A1F2B/FAF6F0?text=Novaris',
+    coverImage: coverFor('জীববিজ্ঞানের বিস্ময়', 'নাজমুল ইসলাম', 'বিজ্ঞান'),
     inStock: true,
     publisher: 'জ্ঞানকোষ প্রকাশনী',
     edition: '১ম সংস্করণ',
@@ -86,7 +99,7 @@ const PLACEHOLDER_BOOKS = [
     regularPrice: 300,
     description: 'ঋতু বদল, ঘূর্ণিঝড় ও জলবায়ু পরিবর্তনের পেছনের বিজ্ঞান, উদাহরণসহ ব্যাখ্যা করা হয়েছে।',
     genre: 'বিজ্ঞান',
-    coverImage: 'https://placehold.co/300x450/7A1F2B/FAF6F0?text=Novaris',
+    coverImage: coverFor('আবহাওয়ার বিজ্ঞান', 'ফারহানা ইয়াসমিন', 'বিজ্ঞান'),
     inStock: true
   },
   {
@@ -97,7 +110,7 @@ const PLACEHOLDER_BOOKS = [
     currentPrice: 400,
     description: 'রোবটিক্স ও কৃত্রিম বুদ্ধিমত্তা কীভাবে আগামী দিনের পৃথিবী বদলে দেবে, তার একটি ঝরঝরে পরিচিতি।',
     genre: 'বিজ্ঞান',
-    coverImage: 'https://placehold.co/300x450/7A1F2B/FAF6F0?text=Novaris',
+    coverImage: coverFor('রোবটিক্সের ভবিষ্যৎ', 'আরিফুল করিম', 'বিজ্ঞান'),
     inStock: true,
     publisher: 'দিগন্ত প্রকাশন',
     edition: '৩য় সংস্করণ',
@@ -115,7 +128,7 @@ const PLACEHOLDER_BOOKS = [
     regularPrice: 500,
     description: 'গ্রামীণ জীবনের প্রেক্ষাপটে এক তরুণীর স্বপ্ন আর সংগ্রামের গল্প।',
     genre: 'উপন্যাস',
-    coverImage: 'https://placehold.co/300x450/C9A227/2B2320?text=Novaris',
+    coverImage: coverFor('নীল আকাশের নিচে', 'শারমিন আক্তার', 'উপন্যাস'),
     inStock: true,
     publisher: 'কথাবিতান',
     bindingType: 'Paperback',
@@ -129,7 +142,7 @@ const PLACEHOLDER_BOOKS = [
     currentPrice: 450,
     description: 'বহু বছর পর নিজের শহরে ফিরে আসা এক মানুষের স্মৃতি ও উপলব্ধির উপন্যাস।',
     genre: 'উপন্যাস',
-    coverImage: 'https://placehold.co/300x450/C9A227/2B2320?text=Novaris',
+    coverImage: coverFor('ফেরার পথ', 'হাসান মজুমদার', 'উপন্যাস'),
     inStock: true,
     edition: '১ম সংস্করণ'
   },
@@ -142,7 +155,7 @@ const PLACEHOLDER_BOOKS = [
     regularPrice: 340,
     description: 'একটি অসম্পূর্ণ চিঠি ঘিরে গড়ে ওঠা পারিবারিক রহস্য ও আবেগের গল্প।',
     genre: 'উপন্যাস',
-    coverImage: 'https://placehold.co/300x450/C9A227/2B2320?text=Novaris',
+    coverImage: coverFor('শেষ চিঠি', 'রুবিনা সুলতানা', 'উপন্যাস'),
     inStock: true,
     publisher: 'কথাবিতান',
     bindingType: 'Paperback',
@@ -156,7 +169,7 @@ const PLACEHOLDER_BOOKS = [
     currentPrice: 400,
     description: 'পাহাড়ি শহরে একলা থাকা এক লেখকের চোখে দেখা জীবনের গল্প।',
     genre: 'উপন্যাস',
-    coverImage: 'https://placehold.co/300x450/C9A227/2B2320?text=Novaris',
+    coverImage: coverFor('মেঘের ওপারে', 'কামরুল আলম', 'উপন্যাস'),
     inStock: false
   },
   {
@@ -168,7 +181,7 @@ const PLACEHOLDER_BOOKS = [
     regularPrice: 560,
     description: 'একটি নদীপাড়ের গ্রামের তিন প্রজন্মের বদলে যাওয়া জীবনযাত্রার আখ্যান।',
     genre: 'উপন্যাস',
-    coverImage: 'https://placehold.co/300x450/C9A227/2B2320?text=Novaris',
+    coverImage: coverFor('একটি নদীর গল্প', 'নাসরিন চৌধুরী', 'উপন্যাস'),
     inStock: true,
     publisher: 'শব্দনীড়',
     edition: '২য় সংস্করণ',
@@ -183,7 +196,7 @@ const PLACEHOLDER_BOOKS = [
     currentPrice: 430,
     description: 'শহরের বুকে হারিয়ে যাওয়া বন্ধুত্ব খুঁজে ফেরার এক মায়াবী উপন্যাস।',
     genre: 'উপন্যাস',
-    coverImage: 'https://placehold.co/300x450/C9A227/2B2320?text=Novaris',
+    coverImage: coverFor('ছায়াপথের ঠিকানা', 'জাহিদ উদ্দিন', 'উপন্যাস'),
     inStock: true,
     publisher: 'শব্দনীড়',
     bindingType: 'Paperback',
@@ -200,7 +213,7 @@ const PLACEHOLDER_BOOKS = [
     regularPrice: 250,
     description: 'বর্ষা, বিরহ আর স্মৃতিকে ঘিরে লেখা স্বল্প ও গভীর কবিতার সংকলন।',
     genre: 'কবিতা',
-    coverImage: 'https://placehold.co/300x450/2B2320/FAF6F0?text=Novaris',
+    coverImage: coverFor('বৃষ্টির খাতা', 'মিজানুর ইসলাম', 'কবিতা'),
     inStock: true,
     publisher: 'ছন্দকথা',
     bindingType: 'Paperback',
@@ -214,7 +227,7 @@ const PLACEHOLDER_BOOKS = [
     currentPrice: 220,
     description: 'দৈনন্দিন জীবনের ছোট ছোট মুহূর্ত নিয়ে লেখা সহজ ভাষার কবিতাগুচ্ছ।',
     genre: 'কবিতা',
-    coverImage: 'https://placehold.co/300x450/2B2320/FAF6F0?text=Novaris',
+    coverImage: coverFor('শব্দের নদী', 'শিরিন আক্তার', 'কবিতা'),
     inStock: true
   },
   {
@@ -226,7 +239,7 @@ const PLACEHOLDER_BOOKS = [
     regularPrice: 220,
     description: 'নতুন দিনের আশা আর সম্ভাবনাকে ঘিরে লেখা স্নিগ্ধ কবিতার বই।',
     genre: 'কবিতা',
-    coverImage: 'https://placehold.co/300x450/2B2320/FAF6F0?text=Novaris',
+    coverImage: coverFor('ভোরের কবিতা', 'কবির হোসেন', 'কবিতা'),
     inStock: true,
     publisher: 'ছন্দকথা',
     edition: '১ম সংস্করণ',
@@ -241,7 +254,7 @@ const PLACEHOLDER_BOOKS = [
     currentPrice: 210,
     description: 'নিঃসঙ্গতা ও আত্ম-অনুসন্ধানের সুরে বাঁধা কবিতার একটি সংকলন।',
     genre: 'কবিতা',
-    coverImage: 'https://placehold.co/300x450/2B2320/FAF6F0?text=Novaris',
+    coverImage: coverFor('নিঃশব্দ সংলাপ', 'তানজিলা বেগম', 'কবিতা'),
     inStock: false
   },
   {
@@ -253,7 +266,7 @@ const PLACEHOLDER_BOOKS = [
     regularPrice: 280,
     description: 'চাঁদনি রাত আর গ্রামবাংলার প্রকৃতিকে ঘিরে লেখা রোমান্টিক কবিতার বই।',
     genre: 'কবিতা',
-    coverImage: 'https://placehold.co/300x450/2B2320/FAF6F0?text=Novaris',
+    coverImage: coverFor('জোছনার খেরোখাতা', 'রোকসানা ইয়াসমিন', 'কবিতা'),
     inStock: true,
     publisher: 'শব্দনীড়',
     bindingType: 'Hardcover',
@@ -267,7 +280,7 @@ const PLACEHOLDER_BOOKS = [
     currentPrice: 190,
     description: 'যাত্রা, পথ আর প্রতীক্ষার অনুভূতি নিয়ে লেখা ছোট ছোট কবিতার সংকলন।',
     genre: 'কবিতা',
-    coverImage: 'https://placehold.co/300x450/2B2320/FAF6F0?text=Novaris',
+    coverImage: coverFor('পথের কবিতা', 'মাহবুব আলম', 'কবিতা'),
     inStock: true,
     publisher: 'ছন্দকথা',
     paperType: 'Newsprint'

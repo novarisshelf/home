@@ -77,6 +77,19 @@ html[data-theme="dark"] .status-delivered { background: #1C3324; color: #6FCF97;
 html[data-theme="dark"] .status-cancelled, html[data-theme="dark"] .order-cancelled-badge { background: #3A2323; color: #F28B82; }
 
 /* ---------- Reset ---------- */
+/* ---------- i18n loading guard ----------
+   Set as html.i18n-loading inline (before body renders) on every page.
+   i18n.js removes this class once static translations are applied, so
+   visitors never see raw keys like "book_request_home_teaser" flash on
+   screen while the module loads (worse on slow connections). If i18n.js
+   ever fails to load, the animation below still reveals the page after
+   1.5s so the site never stays hidden. */
+html.i18n-loading body { opacity: 0; }
+html:not(.i18n-loading) body { animation: i18n-reveal 150ms ease forwards; }
+@keyframes i18n-reveal { from { opacity: 0; } to { opacity: 1; } }
+html.i18n-loading body { animation: i18n-failsafe-reveal 0ms 1.5s forwards; }
+@keyframes i18n-failsafe-reveal { to { opacity: 1; } }
+
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
@@ -275,6 +288,49 @@ h3 { font-size: 1.15rem; }
   padding-top: 8px;
   margin-top: 12px;
 }
+.request-steps {
+  max-width: 780px;
+  margin: 26px auto 10px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+@media (max-width: 700px) {
+  .request-steps { grid-template-columns: 1fr; gap: 16px; }
+}
+.request-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.request-step-num {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--color-bg-shelf);
+  color: var(--color-primary-dark);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.request-step h3 {
+  font-family: var(--font-display);
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 2px 0 3px;
+}
+.request-step p {
+  font-size: 0.83rem;
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
 .book-request-card {
   max-width: 620px;
   margin: 22px auto 40px;
@@ -642,72 +698,86 @@ html[data-theme="dark"] .modal-icon { background: #1C3324; color: #6FCF97; }
 /* ---------- Book card ("on the shelf") ---------- */
 .book-card {
   display: block;
-  background: var(--color-bg-shelf);
-  border: 1px solid var(--color-border);
-  border-bottom: 3px solid var(--color-accent);
+  background: var(--color-surface);
+  border: 1px solid transparent;
   border-radius: var(--radius-md);
-  padding: 12px;
-  box-shadow: var(--shadow-sm);
-  transition: transform var(--transition), box-shadow var(--transition);
+  padding: 10px 10px 14px;
+  box-shadow: 0 1px 2px rgba(43, 35, 32, 0.06);
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
 }
 .book-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 28px -12px rgba(122, 31, 43, 0.22);
+  border-color: var(--color-border);
 }
 .book-card-cover-wrap {
   position: relative;
-  border-radius: var(--radius-sm);
+  border-radius: calc(var(--radius-sm) + 2px);
   overflow: hidden;
   aspect-ratio: 5 / 6;
-  margin-bottom: 10px;
-  box-shadow: inset -6px 0 10px -6px rgba(43, 35, 32, 0.35);
+  margin-bottom: 12px;
+  background: var(--color-bg-shelf);
 }
 .book-card-cover {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 320ms ease;
+}
+.book-card:hover .book-card-cover {
+  transform: scale(1.035);
 }
 .badge-outofstock {
   position: absolute;
   top: 8px;
   left: 8px;
-  background: var(--color-scrim);
+  background: rgba(43, 35, 32, 0.82);
+  backdrop-filter: blur(2px);
   color: var(--color-white);
-  font-size: 0.68rem;
-  padding: 3px 8px;
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  padding: 4px 9px;
   border-radius: 999px;
 }
 .book-card-title {
   font-family: var(--font-display);
-  font-size: 0.98rem;
+  font-size: 0.96rem;
+  line-height: 1.3;
   color: var(--color-text);
-  margin: 0 0 2px;
+  margin: 0 0 3px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 .book-card-author {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: var(--color-text-muted);
-  margin: 0 0 6px;
+  margin: 0 0 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .book-card-price {
   margin: 0;
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: 7px;
   flex-wrap: wrap;
 }
 .price-current {
   font-weight: 700;
   color: var(--color-primary-dark);
-  font-size: 1rem;
+  font-size: 0.98rem;
+  letter-spacing: 0.01em;
 }
 .price-regular {
-  font-size: 0.82rem;
-  color: var(--color-discount);
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
   text-decoration: line-through;
+  text-decoration-color: var(--color-discount);
+  text-decoration-thickness: 1px;
 }
 
 /* ---------- Buttons ---------- */

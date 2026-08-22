@@ -11,12 +11,23 @@
 import { db } from './firebase-config.js';
 import { t } from './i18n.js';
 import { cachedFetch } from './data-cache.js';
+import { generateCoverArt } from './cover-art.js';
 import {
   collection,
   getDocs,
   doc,
   getDoc
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+// Category → cover palette.
+const CATEGORY_PALETTE = {
+  'Hobby & Collectibles': 'clay',
+  'ঘর সাজানোর জিনিস': 'maroon'
+};
+
+function coverFor(title, subtitle, category) {
+  return generateCoverArt(title, subtitle, CATEGORY_PALETTE[category] || 'clay');
+}
 
 const PLACEHOLDER_DECOR_ITEMS = [
   // ---------- Hobby & Collectibles ----------
@@ -29,7 +40,7 @@ const PLACEHOLDER_DECOR_ITEMS = [
     currentPrice: 450,
     regularPrice: 550,
     description: 'হাতে তৈরি ঢাকার রিকশার ছোট্ট প্রতিরূপ, শোকেসে রাখার জন্য চমৎকার একটি সংগ্রহযোগ্য বস্তু।',
-    coverImage: 'https://placehold.co/300x450/A9871C/FFFDF9?text=Novaris',
+    coverImage: coverFor('মিনিয়েচার রিকশা মডেল', 'কাঠ ও ধাতু', 'Hobby & Collectibles'),
     inStock: true
   },
   {
@@ -40,7 +51,7 @@ const PLACEHOLDER_DECOR_ITEMS = [
     dimensions: '২৫ x ২০ সেমি',
     currentPrice: 380,
     description: 'পুরনো দিনের ডাকটিকেট সংরক্ষণের জন্য চামড়ায় বাঁধানো অ্যালবাম, সংগ্রাহকদের জন্য আদর্শ।',
-    coverImage: 'https://placehold.co/300x450/A9871C/FFFDF9?text=Novaris',
+    coverImage: coverFor('ভিন্টেজ ডাকটিকেট অ্যালবাম', 'কাগজ ও চামড়া বাঁধাই', 'Hobby & Collectibles'),
     inStock: true
   },
   {
@@ -52,7 +63,7 @@ const PLACEHOLDER_DECOR_ITEMS = [
     currentPrice: 320,
     regularPrice: 400,
     description: 'পুরনো নকশার পিতলের কম্পাস, ডেস্কে সাজিয়ে রাখার মতো একটি চমৎকার সংগ্রহ।',
-    coverImage: 'https://placehold.co/300x450/A9871C/FFFDF9?text=Novaris',
+    coverImage: coverFor('ব্রাস কম্পাস (এন্টিক)', 'পিতল', 'Hobby & Collectibles'),
     inStock: false
   },
   {
@@ -63,7 +74,7 @@ const PLACEHOLDER_DECOR_ITEMS = [
     dimensions: '১৫ x ১০ সেমি (প্রতিটি)',
     currentPrice: 250,
     description: 'পুরনো ঢাকার দৃশ্য নিয়ে ২০টি পোস্টকার্ডের একটি সংগ্রহযোগ্য সেট।',
-    coverImage: 'https://placehold.co/300x450/A9871C/FFFDF9?text=Novaris',
+    coverImage: coverFor('পোস্টকার্ড সংগ্রহ সেট', 'কাগজ', 'Hobby & Collectibles'),
     inStock: true
   },
 
@@ -77,7 +88,7 @@ const PLACEHOLDER_DECOR_ITEMS = [
     currentPrice: 550,
     regularPrice: 650,
     description: 'ঘরের মেঝেতে গ্রামীণ ছোঁয়া আনতে হাতে বোনা পাটের ম্যাট।',
-    coverImage: 'https://placehold.co/300x450/7A1F2B/FAF6F0?text=Novaris',
+    coverImage: coverFor('হাতে বোনা পাটের ম্যাট', 'পাট', 'ঘর সাজানোর জিনিস'),
     inStock: true
   },
   {
@@ -88,7 +99,7 @@ const PLACEHOLDER_DECOR_ITEMS = [
     dimensions: '৩০ সেমি উচ্চতা',
     currentPrice: 480,
     description: 'হাতে আঁকা নকশার সিরামিক ফুলদানি, ড্রয়িং রুম সাজাতে উপযুক্ত।',
-    coverImage: 'https://placehold.co/300x450/7A1F2B/FAF6F0?text=Novaris',
+    coverImage: coverFor('সিরামিক ফুলদানি', 'সিরামিক', 'ঘর সাজানোর জিনিস'),
     inStock: true
   },
   {
@@ -100,7 +111,7 @@ const PLACEHOLDER_DECOR_ITEMS = [
     currentPrice: 720,
     regularPrice: 850,
     description: 'হাতে খোদাই করা নকশার কাঠের দেয়াল ঘড়ি, দেখতে ক্ল্যাসিক ও টেকসই।',
-    coverImage: 'https://placehold.co/300x450/7A1F2B/FAF6F0?text=Novaris',
+    coverImage: coverFor('কাঠের দেয়াল ঘড়ি', 'সেগুন কাঠ', 'ঘর সাজানোর জিনিস'),
     inStock: true
   },
   {
@@ -111,7 +122,7 @@ const PLACEHOLDER_DECOR_ITEMS = [
     dimensions: '৪০ x ৪০ সেমি',
     currentPrice: 300,
     description: 'ঐতিহ্যবাহী নকশিকাঁথার সেলাইয়ে সাজানো কুশন কভার, সোফাকে দেয় বাঙালি ছোঁয়া।',
-    coverImage: 'https://placehold.co/300x450/7A1F2B/FAF6F0?text=Novaris',
+    coverImage: coverFor('নকশিকাঁথা কুশন কভার', 'সুতি কাপড়', 'ঘর সাজানোর জিনিস'),
     inStock: false
   }
 ];

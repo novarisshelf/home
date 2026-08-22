@@ -210,6 +210,12 @@ const dict = {
     book_request_login_note: 'ভবিষ্যতের জন্য তথ্য সংরক্ষণ করতে ও আপনার রিকোয়েস্ট হিস্ট্রি দেখতে <a href="account.html">লগইন করুন</a>।',
     book_request_history_title: 'আপনার রিকোয়েস্ট হিস্ট্রি',
     book_request_history_empty: 'আপনি এখনো কোনো বই রিকোয়েস্ট করেননি।',
+    book_request_step1_title: 'ফর্ম পূরণ করুন',
+    book_request_step1_desc: 'বইয়ের নাম, লেখক ও ঠিকানা লিখে পাঠিয়ে দিন — এক মিনিটেই শেষ।',
+    book_request_step2_title: 'আমরা খুঁজে বের করি',
+    book_request_step2_desc: 'সাধারণত ১–২ কর্মদিবসের মধ্যে আমরা ফোনে যোগাযোগ করে দাম ও প্রাপ্তিসাপেক্ষে জানাই।',
+    book_request_step3_title: 'ঠিকানায় পৌঁছে যায়',
+    book_request_step3_desc: 'নিশ্চিত হলে বইটি সংগ্রহ করে সরাসরি আপনার ঠিকানায় ডেলিভারি দেওয়া হয়।',
 
     // dashboard.html (owner orders)
     owner_orders_title: 'অর্ডার ইতিহাস',
@@ -435,6 +441,12 @@ const dict = {
     book_request_login_note: 'Save your information for the future and view your request history — <a href="account.html">log in here</a>.',
     book_request_history_title: 'Your Request History',
     book_request_history_empty: "You haven't requested any books yet.",
+    book_request_step1_title: 'Fill out the form',
+    book_request_step1_desc: 'Book title, author, and address — takes under a minute.',
+    book_request_step2_title: 'We track it down',
+    book_request_step2_desc: "We'll usually call within 1–2 business days to confirm price and availability.",
+    book_request_step3_title: 'It reaches your door',
+    book_request_step3_desc: "Once confirmed, we source the book and deliver it straight to your address.",
 
     owner_orders_title: 'Order History',
     owner_orders_empty: 'No orders have come in yet.',
@@ -518,8 +530,25 @@ export function applyStaticTranslations(root = document) {
   });
 }
 
+// ---------- Prevent "flash of untranslated keys" ----------
+// data-i18n elements start life holding their raw key text (e.g.
+// "book_request_home_teaser") until this module runs and swaps in the
+// real string. On a slow connection there's a visible gap between first
+// paint and that swap, during which raw keys are visible. To avoid it,
+// index.html/etc. set `<html class="i18n-loading">` inline (before any
+// content renders) — style.css hides the whole page while that class is
+// present — and this module removes the class only once translation is
+// done, revealing an already-translated page with no flash.
+function revealPage() {
+  document.documentElement.classList.remove('i18n-loading');
+}
+
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => applyStaticTranslations());
+  document.addEventListener('DOMContentLoaded', () => {
+    applyStaticTranslations();
+    revealPage();
+  });
 } else {
   applyStaticTranslations();
+  revealPage();
 }
